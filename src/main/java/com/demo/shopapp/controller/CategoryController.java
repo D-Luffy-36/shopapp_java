@@ -41,11 +41,11 @@ public class CategoryController {
     public ResponseEntity<String> create(
            @Valid @RequestBody CategoryDTO categoryDTO, BindingResult result) {
         if(result.hasErrors()) {
-           List<String> errorMessages = result.getFieldErrors().stream()
-                    .map(FieldError -> FieldError.getDefaultMessage())
-                    .toList();
-           return ResponseEntity.badRequest().body(
-                   "error = " + errorMessages.toString()
+                List<String> errorMessages = result.getFieldErrors().stream()
+                        .map(FieldError -> FieldError.getDefaultMessage())
+                        .toList();
+                return ResponseEntity.badRequest().body(
+                        "error = " + errorMessages.toString()
            );
         }
         return
