@@ -52,8 +52,7 @@ public class ProductController {
     public ResponseEntity<String> create(@Valid @ModelAttribute ProductDTO productDTO,
             BindingResult result) {
 
-        System.out.println("Received name: " + productDTO.getName());
-
+//        System.out.println("Received name: " + productDTO.getName());
         try {
             if(result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors().stream()

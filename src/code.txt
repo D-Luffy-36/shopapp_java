@@ -1,0 +1,5 @@
+// bad request
+ResponseEntity.badRequest().body(e.getMessage());
+// success
+ResponseEntity.ok().body();
+
