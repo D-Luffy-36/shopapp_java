@@ -2,12 +2,10 @@ package com.demo.shopapp.controllers;
 
 import com.demo.shopapp.dtos.OrderDTO;
 import com.demo.shopapp.entities.Order;
-import com.demo.shopapp.entities.Product;
+
 import com.demo.shopapp.mappers.OrderMapper;
 import com.demo.shopapp.responses.ListOrderResponse;
-import com.demo.shopapp.responses.ListProductResponse;
 import com.demo.shopapp.responses.OrderResponse;
-import com.demo.shopapp.responses.ProductResponse;
 import com.demo.shopapp.services.OrderServices.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -45,12 +43,15 @@ public class OrderController {
         return ResponseEntity.ok(listOrderResponse);
     }
 
-    @GetMapping("/{userId}") // id -> path variable lấy id động
-    public ResponseEntity<String> getOrdersByUserId(@PathVariable long userId) {
-        return
-                ResponseEntity.ok(
-                        "orders of user: " + userId
-                );
+    @GetMapping("/users/{userId}") // id -> path variable lấy id động
+    public ResponseEntity<?> getOrdersByUserId(@PathVariable long userId) {
+        try{
+            return ResponseEntity.ok(
+                    orderService.getOrdersByUserId(userId).stream().map(orderMapper::toOrderResponse)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
 

@@ -7,6 +7,8 @@ import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface IProductService {
     Product createProduct(ProductDTO productDTO) throws Exception;
     Page<Product> getAllProducts(int page, int limit);

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class OrderService implements IOrderService {
@@ -91,5 +93,13 @@ public class OrderService implements IOrderService {
         Order existingOrder = this.orderRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Order not found"));
         existingOrder.setActive(false);
         this.orderRepository.save(existingOrder);
+    }
+
+    @Override
+    public List<Order> getOrdersByUserId(long id) {
+        if(this.userRepository.findById(id).isPresent()) {
+            return this.orderRepository.findOrderByUserId(id);
+        }
+        return Collections.emptyList();
     }
 }

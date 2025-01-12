@@ -17,6 +17,7 @@ public interface IOrderService {
     Page<Order> getAllOrders(int page, int limit);
     Order updateOrder(long id, OrderDTO orderDTO);
     void deleteOrder(long id);
+    List<Order> getOrdersByUserId(long id);
 }
 
 //
