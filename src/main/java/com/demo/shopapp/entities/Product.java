@@ -2,9 +2,10 @@ package com.demo.shopapp.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
-@Builder
+@SuperBuilder
 @Table(name = "products")
 @Getter
 @Setter

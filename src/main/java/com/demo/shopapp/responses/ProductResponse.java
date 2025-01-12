@@ -22,6 +22,7 @@ public class ProductResponse extends BaseResponse {
 
     private String category;
 
+
     public static ProductResponse fromProduct(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())

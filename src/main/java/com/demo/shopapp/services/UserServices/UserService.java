@@ -55,18 +55,21 @@ public class UserService implements IUserService {
 //            newUser.setPassword(passwordEncoder.encode(password));
         }
 
-
         return this.userRepository.save(newUser);
 
     }
 
     @Override
     public User getUserById(long id) throws RuntimeException {
-        return null;
+        return this.userRepository.findById(id).orElseThrow(() -> new RuntimeException("user not found"));
     }
 
     @Override
     public String Login(String phone, String password) throws RuntimeException {
+        return null;
+    }
+
+    public String Login(UserLoginDTO userLoginDTO) throws RuntimeException {
         return null;
     }
 }

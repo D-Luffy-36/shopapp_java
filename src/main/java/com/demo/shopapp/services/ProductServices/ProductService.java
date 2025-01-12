@@ -5,13 +5,11 @@ import com.demo.shopapp.dtos.ProductImageDTO;
 import com.demo.shopapp.entities.Category;
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
-import com.demo.shopapp.responses.ProductResponse;
 import com.demo.shopapp.exceptions.DataNotFoundException;
 import com.demo.shopapp.exceptions.InvalidParamException;
 import com.demo.shopapp.repositorys.CategoryRepository;
 import com.demo.shopapp.repositorys.ProductImageRepository;
 import com.demo.shopapp.repositorys.ProductRepository;
-import com.demo.shopapp.responses.ListProductResponses;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,11 +33,7 @@ public class ProductService implements IProductService {
         this.productImageRepository = productImageRepository;
     }
     @Override
-    public Product createProduct(ProductDTO productDTO)  throws Exception{
-//        Boolean existsByName = this.productRepository.existsByName(productDTO.getName());
-//        if (existsByName) {
-//            throw new Exception("existed product name");
-//        }
+    public Product createProduct(ProductDTO productDTO) {
 
         Category category = this.categoryRepository.findCategoryById(productDTO.getCategoryId())
                 .orElseThrow(() -> new DataNotFoundException("Category not found with id: " + productDTO.getCategoryId()));
@@ -62,16 +56,14 @@ public class ProductService implements IProductService {
         }
 
         Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdAt").descending());
-        Page<Product> products = this.productRepository.findAll(pageable);
+        return this.productRepository.findAll(pageable);
 
-        return products;
     }
 
     @Override
     public Product getProductById(Long id) {
-        Product existingProduct = this.productRepository.findById(id)
+        return this.productRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Product not found with id: " + id));
-       return existingProduct;
     }
 
     @Override
@@ -95,8 +87,8 @@ public class ProductService implements IProductService {
     @Override
     public void deleteProduct(Long id) {
         // xóa cứng
-        Optional<Product> currentProduct = this.productRepository.findById(id);
-        currentProduct.ifPresent(this.productRepository::delete);
+        Product currentProduct = this.productRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Product not found with id: " + id));
+        this.productRepository.delete(currentProduct);
     }
 
     public ProductImage createProductImage(Long productId,
@@ -118,11 +110,14 @@ public class ProductService implements IProductService {
 
     }
 
-//    boolean ExistingProduct(Long productId) {
+    public boolean existingProductName(String name){
+        return this.productRepository.existsByName(name);
+    }
+
+//    boolean existingProduct(Long productId) {
 //        Optional<Product> currentProduct = this.productRepository.findById(productId);
 //        return currentProduct.isPresent();
 //    }
-
 
 
 }

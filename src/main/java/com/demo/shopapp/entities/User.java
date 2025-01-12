@@ -3,13 +3,13 @@ package com.demo.shopapp.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import lombok.experimental.SuperBuilder;
 
 
 import java.time.LocalDate;
 
 @Entity
-@Builder
+@SuperBuilder
 @Table(name = "users")
 @Setter
 @Getter

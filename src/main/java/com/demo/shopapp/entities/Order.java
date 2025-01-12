@@ -5,12 +5,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+
 import java.time.LocalDateTime;
-import java.util.Date;
 
 
 @Entity
-@Builder
+@SuperBuilder
 @Table(name = "orders")
 @Setter
 @Getter
@@ -22,7 +22,7 @@ public class Order extends BaseEntity{
     private Long id;
 
     // User Instance
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -56,7 +56,7 @@ public class Order extends BaseEntity{
     private String shippingAddress;
 
     @Column(name = "shipping_date")
-    private Date shippingDate;
+    private LocalDateTime shippingDate;
 
     @Column(name = "tracking_number")
     private String trackingNumber;
@@ -64,6 +64,7 @@ public class Order extends BaseEntity{
     @Column(name = "payment_method")
     private String paymentMethod;
 
+    private double discount;
 
     @Column(name = "active")
     private Boolean active;

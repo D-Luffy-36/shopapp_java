@@ -4,9 +4,12 @@ import com.demo.shopapp.dtos.ProductDTO;
 import com.demo.shopapp.dtos.ProductImageDTO;
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
-import com.demo.shopapp.responses.ListProductResponses;
+import com.demo.shopapp.exceptions.DataNotFoundException;
+import com.demo.shopapp.responses.ListProductResponse;
 import com.demo.shopapp.responses.ProductResponse;
 import com.demo.shopapp.services.ProductServices.ProductService;
+
+import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -35,35 +38,40 @@ public class ProductController {
         this.productService = productService;
     }
 
-
     @GetMapping()
-    public ListProductResponses list(
+    public ResponseEntity<ListProductResponse> list(
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
         Page<Product> products =  this.productService.getAllProducts(page, limit);
-        return ListProductResponses.builder()
+        ListProductResponse listProductResponses =  ListProductResponse.builder()
                 .products(products.getContent()
-                        .stream()
-                        .map(ProductResponse::fromProduct)
-                        .toList())
+                .stream()
+                .map(
+                        ProductResponse::fromProduct).toList()
+                )
                 .totalPages(products.getTotalPages())
                 .build();
+        return ResponseEntity.ok(listProductResponses);
 
     }
 
     @GetMapping("/{id}") // id -> path variable lấy id động
-    public ResponseEntity<String> detail(@PathVariable("id") long id) {
-        return
-                ResponseEntity.ok(
-                        "product" + id
-                );
+    public ResponseEntity<?> detail(@PathVariable("id") long id) {
+        try{
+
+            Product existingProduct = this.productService.getProductById(id);
+            return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
+
+        }catch(DataNotFoundException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
     @PostMapping()
     public ResponseEntity<?> create(@Valid @RequestBody ProductDTO productDTO,
             BindingResult result) {
-
         try {
             if(result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors().stream()
@@ -103,16 +111,19 @@ public class ProductController {
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable long id) {
-        return
-                ResponseEntity.ok(
-                        "delete product" + id
-                );
+    public ResponseEntity<?> delete(@PathVariable long id) {
+        // xóa mềm
+        try{
+            Product existingProduct = this.productService.getProductById(id);
+            this.productService.deleteProduct(id);
+            return ResponseEntity.ok("delete product id: " + id  + " succesfully");
+
+        }catch(DataNotFoundException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     private String storeFile(MultipartFile file) throws IOException {
@@ -194,4 +205,37 @@ public class ProductController {
 
     }
 
+
+//    @PostMapping("/generateFakeProducts")
+    public ResponseEntity<?> generateFakeProducts() {
+        try{
+            final int MAX = 1000000;
+            Faker faker = new Faker();
+            Random random = new Random();
+            for(int i = 0; i < MAX; i++){
+                String name = faker.commerce().productName();
+                if(this.productService.existingProductName(name)){
+                    continue;
+                }
+                Float price = random.nextFloat() * (10000000 - 0) + 0;
+                String thumbnail = faker.internet().avatar(); // Link ảnh giả
+                String description = faker.lorem().paragraph(); // Mô tả
+                Float discount = random.nextFloat() * (100 - 0) + 0; // Giảm giá (0 đến 100)
+                Long categoryId = (long) (random.nextInt(6) + 1);  // Random từ 1 đến 6
+                ProductDTO productDTO = ProductDTO.builder()
+                        .name(name)
+                        .price(price)
+                        .thumbnail(thumbnail)
+                        .discount(discount)
+                        .categoryId(categoryId)
+                        .description(description)
+                        .build();
+                this.productService.createProduct(productDTO);
+            }
+            return ResponseEntity.ok("create " + MAX + " products" + " successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
 }

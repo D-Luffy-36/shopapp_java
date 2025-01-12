@@ -58,7 +58,7 @@ public class CategorySevice implements ICategoryService {
 
     @Override
     public void deleteCategoryById(long id) {
-        // soft delet
+        // soft delete
         Category currentCategory = getCategoryById(id);
         currentCategory.setName("");
         this.categoryRepository.save(currentCategory);

@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
@@ -16,7 +19,7 @@ public class OrderDTO {
     @Min(value = 1, message = "id >= 1")
     private Long userId;
 
-    @JsonProperty("fullname")
+    @JsonProperty("full_name")
     @NotEmpty(message = "Full name cannot be empty")
     @Size(min = 2, max = 100, message = "Full name must be between 2 and 100 characters")
     private String fullName;
@@ -49,9 +52,21 @@ public class OrderDTO {
     @NotEmpty(message = "Shipping address cannot be empty")
     private String shippingAddress;
 
+    @JsonProperty("shipping_date")
+    private LocalDateTime shippingDate;
+
     @JsonProperty("payment_method")
     @NotEmpty(message = "Payment method cannot be empty")
     private String paymentMethod;
+
+    @JsonProperty("tracking_number")
+    private String trackingNumber;
+
+    @JsonProperty("order_date")
+    private LocalDate orderDate;
+
+    @JsonProperty(value = "discount")
+    private double discount;
 }
 
 

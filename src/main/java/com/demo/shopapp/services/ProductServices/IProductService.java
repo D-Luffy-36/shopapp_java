@@ -5,11 +5,7 @@ import com.demo.shopapp.dtos.ProductImageDTO;
 
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
-import com.demo.shopapp.responses.ListProductResponses;
-import com.demo.shopapp.responses.ProductResponse;
 import org.springframework.data.domain.Page;
-
-import java.util.List;
 
 public interface IProductService {
     Product createProduct(ProductDTO productDTO) throws Exception;

@@ -5,14 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 
+import java.util.List;
 
 @AllArgsConstructor
 @Data
 @Builder
 @NoArgsConstructor
-public class ListProductResponses {
-    private List<ProductResponse> products;
+public class ListOrderResponse {
+    private List<OrderResponse> orders;
     private int totalPages;
 }
