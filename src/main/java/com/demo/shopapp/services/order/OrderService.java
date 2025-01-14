@@ -1,4 +1,4 @@
-package com.demo.shopapp.services.OrderServices;
+package com.demo.shopapp.services.order;
 
 import com.demo.shopapp.dtos.OrderDTO;
 import com.demo.shopapp.entities.Order;
@@ -9,13 +9,13 @@ import com.demo.shopapp.mappers.OrderMapper;
 import com.demo.shopapp.repositorys.OrderRepository;
 import com.demo.shopapp.repositorys.UserRepository;
 
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +27,8 @@ public class OrderService implements IOrderService {
     private final UserRepository userRepository;
     private final OrderMapper orderMapper;
 
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository,
+    public OrderService(OrderRepository orderRepository,
+                        UserRepository userRepository,
                         OrderMapper orderMapper) {
 
         this.orderRepository = orderRepository;
@@ -36,25 +37,29 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order createOrder(OrderDTO orderDTO) {
+    public Order createOrder(OrderDTO orderDTO) throws Exception {
         User existingUser = this.userRepository.findById(orderDTO.getUserId()).orElseThrow(
-                () -> new DataNotFoundException("User not found")
+                () -> new DataNotFoundException("User not found with id: " + orderDTO.getUserId())
         );
 
         // conver OrderDto -> Order
-        Order newOrder = this.orderMapper.toOrder(orderDTO, userRepository);
-
+        Order newOrder = this.orderMapper.toOrder(orderDTO);
+        newOrder.setUser(existingUser);
         newOrder.setActive(true);
         newOrder.setStatus(OrderStatus.PENDING);
+        newOrder.setOrderDate(LocalDateTime.now());
+        // check shipping date >= ngay hom nay
 
+        // đoạn này cần xử lí phức tạp
 
+        newOrder.setShippingDate(LocalDateTime.now());
 
         return this.orderRepository.save(newOrder);
     }
 
     @Override
     public Order getOrderById(long id) {
-        return null;
+        return this.orderRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Order not found with id: " + id));
     }
 
 
@@ -74,13 +79,32 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order updateOrder(long id, OrderDTO orderDTO) {
+    public Order updateOrder(long id, OrderDTO orderDTO) throws Exception{
         Order existingOrder = this.orderRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Order not found"));
+        User existingUser = this.userRepository.findById(orderDTO.getUserId()).orElseThrow(() -> new DataNotFoundException("User not found with id: " + orderDTO.getUserId()));
+
         this.orderMapper.updateOrderFromDTO(orderDTO, existingOrder);
+
+        existingOrder.setUser(existingUser);
+
+        LocalDateTime shippingDate = orderDTO.getShippingDate() == null
+                ?  LocalDateTime.now()
+                : orderDTO.getShippingDate();
+
+        // nếu ngày shipping date hợp lệ thì set
+        if(shippingDate.isAfter(LocalDateTime.now()) && shippingDate.isAfter(existingOrder.getOrderDate())) {
+            existingOrder.setShippingDate(shippingDate);
+        } else {
+            // Xử lý trường hợp ngày giao hàng không hợp lệ, có thể ném ngoại lệ
+            throw new Exception("Delivery date must be in the future and after the order date.");
+        }
+
         // Lưu lại đối tượng đã cập nhật
-        existingOrder.setStatus(OrderStatus.PENDING);
-        existingOrder.setActive(true);
-        existingOrder.setShippingDate(orderDTO.getShippingDate());
+        if(orderDTO.getStatus() == null || orderDTO.getStatus().isEmpty() || !OrderStatus.VALID_STATUSES.contains(orderDTO.getStatus())){
+            existingOrder.setStatus(OrderStatus.PENDING);
+        }else {
+            existingOrder.setStatus(orderDTO.getStatus());
+        }
 
         return this.orderRepository.save(
                 existingOrder

@@ -1,4 +1,4 @@
-package com.demo.shopapp.services.ProductServices;
+package com.demo.shopapp.services.product;
 
 import com.demo.shopapp.dtos.ProductDTO;
 import com.demo.shopapp.dtos.ProductImageDTO;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService implements IProductService {

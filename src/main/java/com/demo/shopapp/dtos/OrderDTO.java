@@ -63,7 +63,13 @@ public class OrderDTO {
     private String trackingNumber;
 
     @JsonProperty("order_date")
-    private LocalDate orderDate;
+    private LocalDateTime orderDate;
+
+    @JsonProperty("status")
+    private String status;
+
+    @JsonProperty("active")
+    private Boolean active;
 
     @JsonProperty(value = "discount")
     private double discount;

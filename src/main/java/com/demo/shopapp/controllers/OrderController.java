@@ -4,11 +4,14 @@ import com.demo.shopapp.dtos.OrderDTO;
 import com.demo.shopapp.entities.Order;
 
 import com.demo.shopapp.mappers.OrderMapper;
-import com.demo.shopapp.responses.ListOrderResponse;
-import com.demo.shopapp.responses.OrderResponse;
-import com.demo.shopapp.services.OrderServices.OrderService;
+import com.demo.shopapp.responses.ResponseObject;
+import com.demo.shopapp.responses.order.ListOrderResponse;
+import com.demo.shopapp.responses.order.OrderResponse;
+import com.demo.shopapp.services.order.OrderService;
 import jakarta.validation.Valid;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -44,19 +47,46 @@ public class OrderController {
     }
 
     @GetMapping("/users/{userId}") // id -> path variable lấy id động
-    public ResponseEntity<?> getOrdersByUserId(@PathVariable long userId) {
+    public ResponseObject<?> getOrdersByUserId(@PathVariable long userId) {
         try{
-            return ResponseEntity.ok(
-                    orderService.getOrdersByUserId(userId).stream().map(orderMapper::toOrderResponse)
-            );
+            return ResponseObject.<List<OrderResponse>>builder()
+                    .data(
+                            this.orderService.getOrdersByUserId(userId)
+                                    .stream()
+                                    .map(this.orderMapper::toOrderResponse)
+                                    .toList()
+                    )
+                    .status(HttpStatus.OK)
+                    .build();
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return  ResponseObject.<OrderResponse>builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
         }
     }
 
+    @GetMapping("/{id}")
+    public ResponseObject<?> getOrderById(@PathVariable long id) {
+        try{
+            Order order = this.orderService.getOrderById(id);
+            OrderResponse orderResponse = this.orderMapper.toOrderResponse(order);
+            return   ResponseObject.<OrderResponse>builder()
+                        .status(HttpStatus.OK)
+                        .data(orderResponse)
+                        .build();
+
+        } catch (Exception e) {
+            return  ResponseObject.<OrderResponse>builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
+        }
+    }
 
     @PostMapping()
-    public ResponseEntity<?> create(@Valid @RequestBody OrderDTO orderDTO, BindingResult result) {
+    public ResponseObject<OrderResponse> create(@Valid @RequestBody OrderDTO orderDTO, BindingResult result) {
 
         try{
             if(result.hasErrors()) {
@@ -64,24 +94,27 @@ public class OrderController {
                         .map(FieldError -> FieldError.getDefaultMessage())
                         .toList();
 
-                return ResponseEntity.badRequest().body("error = " + errorMessages.toString());
+                return  ResponseObject.<OrderResponse>builder()
+                        .message(errorMessages.toString())
+                        .status(HttpStatus.BAD_REQUEST)
+                        .build();
             }
+
             Order newOrder = this.orderService.createOrder(orderDTO);
-
 //            OrderResponse.fromOrder(newOrder);
-
             OrderResponse newOrderResponse = orderMapper.toOrderResponse(newOrder);
-
-            return ResponseEntity.ok(Map.of(
-                    "status", "success",
-                    "message", "Order created successfully",
-                    "data", newOrderResponse
-            ));
+            return  ResponseObject.<OrderResponse>builder()
+                    .message("succesfully created new order")
+                    .status(HttpStatus.CREATED)
+                    .data(newOrderResponse)
+                    .build();
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseObject.<OrderResponse>builder()
+                    .message(e.getMessage())
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
         }
-
     }
 
     @PutMapping("/{id}")
@@ -119,5 +152,12 @@ public class OrderController {
 
     }
 
-
 }
+
+
+
+
+
+
+
+

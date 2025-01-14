@@ -1,6 +1,7 @@
-package com.demo.shopapp.responses;
+package com.demo.shopapp.responses.product;
 
 import com.demo.shopapp.entities.Product;
+import com.demo.shopapp.responses.BaseResponse;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

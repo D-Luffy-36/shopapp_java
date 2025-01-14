@@ -5,9 +5,9 @@ import com.demo.shopapp.dtos.ProductImageDTO;
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
 import com.demo.shopapp.exceptions.DataNotFoundException;
-import com.demo.shopapp.responses.ListProductResponse;
-import com.demo.shopapp.responses.ProductResponse;
-import com.demo.shopapp.services.ProductServices.ProductService;
+import com.demo.shopapp.responses.product.ListProductResponse;
+import com.demo.shopapp.responses.product.ProductResponse;
+import com.demo.shopapp.services.product.ProductService;
 
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;

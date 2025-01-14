@@ -1,6 +1,9 @@
 package com.demo.shopapp.entities;
 
+
 import lombok.Builder;
+
+import java.util.Set;
 
 @Builder
 public class OrderStatus {
@@ -9,4 +12,8 @@ public class OrderStatus {
     public static final String SHIPPED = "shipped";
     public static final String DELIVERED = "delivered";
     public static final String CANCELLED = "cancelled";
+
+    public static final Set<String> VALID_STATUSES = Set.of(
+            PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    );
 }

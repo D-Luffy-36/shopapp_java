@@ -1,8 +1,7 @@
-package com.demo.shopapp.services.UserServices;
+package com.demo.shopapp.services.user;
 
 
 import com.demo.shopapp.dtos.UserDTO;
-import com.demo.shopapp.dtos.UserLoginDTO;
 
 import com.demo.shopapp.entities.User;
 

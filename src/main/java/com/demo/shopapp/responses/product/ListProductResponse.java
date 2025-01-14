@@ -1,4 +1,4 @@
-package com.demo.shopapp.responses;
+package com.demo.shopapp.responses.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

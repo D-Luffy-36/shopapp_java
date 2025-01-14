@@ -1,6 +1,7 @@
-package com.demo.shopapp.responses;
+package com.demo.shopapp.responses.order;
 
 import com.demo.shopapp.entities.Order;
+import com.demo.shopapp.responses.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;

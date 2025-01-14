@@ -2,7 +2,7 @@ package com.demo.shopapp.controllers;
 
 import com.demo.shopapp.dtos.CategoryDTO;
 import com.demo.shopapp.entities.Category;
-import com.demo.shopapp.services.CategoryServices.CategorySevice;
+import com.demo.shopapp.services.category.CategorySevice;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

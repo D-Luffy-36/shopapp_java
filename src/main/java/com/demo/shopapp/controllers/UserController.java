@@ -4,7 +4,7 @@ import com.demo.shopapp.dtos.UserDTO;
 import com.demo.shopapp.dtos.UserLoginDTO;
 import com.demo.shopapp.entities.User;
 
-import com.demo.shopapp.services.UserServices.UserService;
+import com.demo.shopapp.services.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

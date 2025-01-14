@@ -1,21 +1,17 @@
-package com.demo.shopapp.services.OrderServices;
+package com.demo.shopapp.services.order;
 
 
 import com.demo.shopapp.dtos.OrderDTO;
-import com.demo.shopapp.dtos.ProductDTO;
-import com.demo.shopapp.dtos.ProductImageDTO;
 import com.demo.shopapp.entities.Order;
-import com.demo.shopapp.entities.Product;
-import com.demo.shopapp.entities.ProductImage;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface IOrderService {
-    Order createOrder(OrderDTO orderDTO);
-    Order getOrderById(long id);
+    Order createOrder(OrderDTO orderDTO) throws Exception;
+    Order getOrderById(long id) throws Exception;
     Page<Order> getAllOrders(int page, int limit);
-    Order updateOrder(long id, OrderDTO orderDTO);
+    Order updateOrder(long id, OrderDTO orderDTO) throws Exception;
     void deleteOrder(long id);
     List<Order> getOrdersByUserId(long id);
 }
