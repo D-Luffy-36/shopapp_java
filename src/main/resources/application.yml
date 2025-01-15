@@ -33,4 +33,9 @@ spring:
 api:
   prefix: /api/v1
 
+jwt:
+  secretKey: hzLjuCBn4Sm4dU3tngYJ0u7hN6kChqAi
+  expiration: (60 * 60) * 24 * 30
+  expiration-refresh-token: 5184000 #60 days = 60 * 24 * 60 * 60
+
 #  spring.jpa.hibernate.ddl-auto=none

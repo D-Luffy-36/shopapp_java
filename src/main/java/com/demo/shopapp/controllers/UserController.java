@@ -4,6 +4,7 @@ import com.demo.shopapp.dtos.UserDTO;
 import com.demo.shopapp.dtos.UserLoginDTO;
 import com.demo.shopapp.entities.User;
 
+import com.demo.shopapp.responses.user.UserResponse;
 import com.demo.shopapp.services.user.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -39,14 +40,15 @@ public class UserController {
                         "error = " + errorMessages.toString()
                 );}
             // check nhập lại password
-            if (!userDTO.getPassWord().equals(userDTO.getRetypePassWord())) {
+            if (!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
                 return ResponseEntity.badRequest().body("wrong retypePassWord");
             }
             User newUser = this.userService.create(userDTO);
+            UserResponse userResponse = UserResponse.fromUser(newUser);
             // Tạo Map để chứa response
             Map<String, Object> response = new HashMap<>();
             response.put("message", "User created successfully");
-            response.put("data", newUser);
+            response.put("data", userResponse);
 
             return ResponseEntity.ok().body(response);
         }catch(Exception e){

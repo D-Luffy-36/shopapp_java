@@ -10,7 +10,7 @@ public interface IUserService {
 
     User getUserById(long id) throws RuntimeException;
 
-    String Login(String phone, String password) throws RuntimeException;
+    String Login(String phonNumber, String password) throws RuntimeException;
 }
 
 

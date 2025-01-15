@@ -4,9 +4,15 @@ package com.demo.shopapp.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @SuperBuilder
@@ -15,7 +21,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,10 +42,10 @@ public class User extends BaseEntity {
     private LocalDate dateOfBirth;
 
     @Column(name = "facebook_account_id", unique = true)
-    private Long faceBookAccountId;
+    private String faceBookAccountId;
 
     @Column(name = "google_account_id", unique = true)
-    private Long googleAccountId;
+    private String googleAccountId;
 
     @Column(name = "is_active")
     private Boolean isActive;
@@ -49,21 +55,77 @@ public class User extends BaseEntity {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    /**
+     * Returns the authorities granted to the user. Cannot return <code>null</code>.
+     *
+     * @return the authorities, sorted by natural key (never <code>null</code>)
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+        authorityList.add(new SimpleGrantedAuthority("ROLE_"+getRole().getName().toUpperCase()));
+        return authorityList;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+    /**
+     * Returns the username used to authenticate the user. Cannot return
+     * <code>null</code>.
+     *
+     * @return the username (never <code>null</code>)
+     */
+    @Override
+    public String getUsername() {
+        return phoneNumber;
+    }
+
+    /**
+     * Indicates whether the user's account has expired. An expired account cannot be
+     * authenticated.
+     *
+     * @return <code>true</code> if the user's account is valid (ie non-expired),
+     * <code>false</code> if no longer valid (ie expired)
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    /**
+     * Indicates whether the user is locked or unlocked. A locked user cannot be
+     * authenticated.
+     *
+     * @return <code>true</code> if the user is not locked, <code>false</code> otherwise
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    /**
+     * Indicates whether the user's credentials (password) has expired. Expired
+     * credentials prevent authentication.
+     *
+     * @return <code>true</code> if the user's credentials are valid (ie non-expired),
+     * <code>false</code> if no longer valid (ie expired)
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    /**
+     * Indicates whether the user is enabled or disabled. A disabled user cannot be
+     * authenticated.
+     *
+     * @return <code>true</code> if the user is enabled, <code>false</code> otherwise
+     */
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
 }
-
-
-//CREATE TABLE [users] (
-//        [id] BIGINT PRIMARY KEY IDENTITY(1, 1),
-//  [fullname] VARCHAR(150),
-//  [phone_number] VARCHAR(10) NOT NULL,
-//  [address] VARCHAR(255) DEFAULT '',
-//  [password] VARCHAR(255) NOT NULL DEFAULT '',
-//   [created_at] DATETIME DEFAULT 'GETDATE()',
-//        [updated_at] DATETIME DEFAULT 'GETDATE()',
-//        [is_active] BIT DEFAULT (1),
-//  [date_of_birth] DATE NOT NULL,
-//        [facebook_account_id] BIGINT DEFAULT (0),
-//  [google_account_id] BIGINT DEFAULT (0),
-//  [role_id] BIGINT
-//)
-//GO

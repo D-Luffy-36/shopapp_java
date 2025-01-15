@@ -7,9 +7,8 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhoneNumber(String phoneNumber);
-    boolean existsByGoogleAccountId(Long googleId);
-    boolean existsByFaceBookAccountId(Long facebookId);
+    boolean existsByGoogleAccountId(String googleId);
+    boolean existsByFaceBookAccountId(String facebookId);
 
-    Optional<User> findByPhoneNumber(String phoneNumber);
-
+    Optional<User> findUsersByPhoneNumber(String phone);
 }

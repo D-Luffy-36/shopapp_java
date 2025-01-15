@@ -25,11 +25,11 @@ public class UserDTO {
 
     @NotBlank(message = "pass word can not be blank")
     @JsonProperty("password")
-    private String passWord;
+    private String password;
 
     @NotBlank(message = "pass word can not be blank")
     @JsonProperty("retype_password")
-    private String retypePassWord;
+    private String retypePassword;
 
     @JsonProperty("is_active")
     private boolean isActive;
@@ -40,11 +40,11 @@ public class UserDTO {
 
     @JsonProperty("facebook_account_id")
     @Column(unique = true)
-    private Long facebookAccountId;
+    private String facebookAccountId;
 
     @JsonProperty("google_account_id")
     @Column(unique = true)
-    private Long googleAccountId;
+    private String googleAccountId;
 
     @NotNull(message = "role id is required")
     @JsonProperty("role_id")
@@ -63,12 +63,12 @@ public class UserDTO {
         return address;
     }
 
-    public String getPassWord() {
-        return passWord;
+    public String getPassword() {
+        return password;
     }
 
-    public String getRetypePassWord() {
-        return retypePassWord;
+    public String getRetypePassword() {
+        return retypePassword;
     }
 
     public boolean isActive() {
@@ -79,11 +79,11 @@ public class UserDTO {
         return dateOfBirth;
     }
 
-    public Long getFacebookAccountId() {
+    public String getFacebookAccountId() {
         return facebookAccountId;
     }
 
-    public Long getGoogleAccountId() {
+    public String getGoogleAccountId() {
         return googleAccountId;
     }
 
