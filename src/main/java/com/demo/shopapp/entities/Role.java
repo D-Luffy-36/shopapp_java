@@ -21,11 +21,7 @@ public class Role {
 
     @Column(nullable = false)
     private String name;
-}
 
-//
-//CREATE TABLE [roles] (
-//        [id] BIGINT PRIMARY KEY,
-//        [name] varchar(20) NOT NULL
-//)
-//GO
+    public static  String ADMIN = "ADMIN";
+    public static  String USER = "USER";
+}

@@ -5,6 +5,7 @@ import com.demo.shopapp.dtos.ProductImageDTO;
 
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
+import com.demo.shopapp.exceptions.InvalidParamException;
 import org.springframework.data.domain.Page;
 
 public interface IProductService {
@@ -14,7 +15,7 @@ public interface IProductService {
     Product getProductById(Long id) throws Exception;
     Product updateProduct(Long id, ProductDTO productDTO) throws Exception;
     void deleteProduct(Long id) throws Exception;
-    ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO);
+    ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws InvalidParamException;
 
 }
 

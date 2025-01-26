@@ -1,6 +1,7 @@
 package com.demo.shopapp.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @MappedSuperclass
 public class BaseEntity {
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

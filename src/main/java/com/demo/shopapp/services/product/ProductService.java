@@ -91,7 +91,7 @@ public class ProductService implements IProductService {
     }
 
     public ProductImage createProductImage(Long productId,
-                                           ProductImageDTO productImageDTO ) {
+                                           ProductImageDTO productImageDTO ) throws InvalidParamException {
 
         Product existingProduct = this.productRepository.findById(productId)
                 .orElseThrow(() -> new DataNotFoundException("Product not found with id: " + productId));
@@ -103,7 +103,7 @@ public class ProductService implements IProductService {
         // không cho insert quá 5 ảnh cho 1 sản phầm
         List<ProductImage> images = this.productImageRepository.findByProductId(productId);
         if(images.size() >= 5){
-            throw  new InvalidParamException("number param <= 5");
+            throw new InvalidParamException("number param <= 5");
         }
         return this.productImageRepository.save(newProductImage);
 

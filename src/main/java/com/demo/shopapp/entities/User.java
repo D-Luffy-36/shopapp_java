@@ -1,6 +1,7 @@
 package com.demo.shopapp.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -39,6 +40,7 @@ public class User extends BaseEntity implements UserDetails {
     private String password;
 
     @Column(name = "date_of_birth", nullable = true)
+    @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày theo "yyyy-MM-dd"
     private LocalDate dateOfBirth;
 
     @Column(name = "facebook_account_id", unique = true)
@@ -64,6 +66,8 @@ public class User extends BaseEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("ROLE_"+getRole().getName().toUpperCase()));
+//        authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+
         return authorityList;
     }
 

@@ -1,9 +1,7 @@
 package com.demo.shopapp.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
-
 
 @Entity
 @Table(name = "product_images")

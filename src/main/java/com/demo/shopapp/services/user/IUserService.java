@@ -3,14 +3,15 @@ package com.demo.shopapp.services.user;
 
 import com.demo.shopapp.dtos.UserDTO;
 
+import com.demo.shopapp.dtos.UserLoginDTO;
 import com.demo.shopapp.entities.User;
 
 public interface IUserService {
-    User create(UserDTO uerDTO) throws RuntimeException;
+    User create(UserDTO uerDTO) throws Exception;
 
-    User getUserById(long id) throws RuntimeException;
+    User getUserById(long id) throws Exception;
 
-    String Login(String phonNumber, String password) throws RuntimeException;
+    String login(UserLoginDTO userLoginDTO) throws Exception;
 }
 
 

@@ -156,7 +156,7 @@ public class ProductController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImgs(
             @PathVariable Long id,
-            @RequestParam("files") List<MultipartFile> files) throws IOException {
+            @RequestParam("files") List<MultipartFile> files) throws IOException, Exception {
 
         files = files == null ? new ArrayList<>() : files;
         if(files.size() > ProductImage.MAX_IMAGES){

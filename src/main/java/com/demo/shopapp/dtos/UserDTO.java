@@ -35,7 +35,7 @@ public class UserDTO {
     private boolean isActive;
 
     @JsonProperty("date_of_birth")
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày theo "yyyy-MM-dd"
     private LocalDate dateOfBirth;
 
     @JsonProperty("facebook_account_id")

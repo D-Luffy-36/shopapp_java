@@ -2,20 +2,23 @@ package com.demo.shopapp.responses.user;
 
 import com.demo.shopapp.entities.Role;
 import com.demo.shopapp.entities.User;
+import com.demo.shopapp.responses.BaseResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-import java.util.Date;
+
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class UserResponse {
+public class UserResponse extends BaseResponse {
     @JsonProperty("id")
     private Long id;
 
@@ -35,6 +38,7 @@ public class UserResponse {
     private boolean active;
 
     @JsonProperty("date_of_birth")
+    @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày theo "yyyy-MM-dd"
     private LocalDate dateOfBirth;
 
     @JsonProperty("facebook_account_id")
@@ -54,7 +58,7 @@ public class UserResponse {
                 .address(user.getAddress())
 //                .profileImage(user.getProfileImage())
                 .active(user.getIsActive())
-                .dateOfBirth(user.getDateOfBirth())
+                .dateOfBirth(LocalDate.from(user.getDateOfBirth()))
                 .facebookAccountId(user.getFaceBookAccountId())
                 .googleAccountId(user.getGoogleAccountId())
                 .role(user.getRole())

@@ -1,13 +1,16 @@
 package com.demo.shopapp.services.user;
 
 
+import com.demo.shopapp.components.JwtTokenUtils;
 import com.demo.shopapp.dtos.UserDTO;
 import com.demo.shopapp.dtos.UserLoginDTO;
 import com.demo.shopapp.entities.Role;
 import com.demo.shopapp.entities.User;
 import com.demo.shopapp.exceptions.DataNotFoundException;
+import com.demo.shopapp.exceptions.PermissionDeniedException;
 import com.demo.shopapp.repositorys.RoleRepository;
 import com.demo.shopapp.repositorys.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,31 +20,28 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtils jwtTokenUtils;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(UserRepository userRepository
-                       , RoleRepository roleRepository
-                       , PasswordEncoder passwordEncoder
-    ) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
-    public User create(UserDTO userDTO) throws RuntimeException {
+    public User create(UserDTO userDTO) throws Exception {
         boolean existPhonumber = this.userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
         if (existPhonumber) {
             throw new RuntimeException("existed phone number");
         }
-        Optional<Role> role = this.roleRepository.findRoleById(userDTO.getRoleId());
-        if(role.isEmpty()){
-            throw new RuntimeException("role not found");
+
+        Role role = roleRepository.findRoleById(userDTO.getRoleId())
+                .orElseThrow(   () -> new RuntimeException("no role found"));
+
+        if (role.getName().equalsIgnoreCase(Role.ADMIN)) {
+            throw new PermissionDeniedException("Registering admin accounts is not allowed");
         }
+
 
         // tao đăng nhập mạng xã hội
         User newUser = User.builder()
@@ -49,9 +49,8 @@ public class UserService implements IUserService {
                 .phoneNumber(userDTO.getPhoneNumber())
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .address(userDTO.getAddress())
-                .password("")
                 .isActive(true)
-                .role(role.orElseThrow(() -> new DataNotFoundException("Role not found")))
+                .role(role)
                 .build();
 
         // Nếu không có Facebook hoặc Google account (tức là cả hai là chuỗi rỗng), thì yêu cầu nhập mật khẩu
@@ -75,10 +74,7 @@ public class UserService implements IUserService {
                newUser.setFaceBookAccountId(userDTO.getFacebookAccountId());
             }
         }
-
-
         return this.userRepository.save(newUser);
-
     }
 
     @Override
@@ -87,17 +83,19 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String Login(String phonNumber, String password) throws RuntimeException {
-        return null;
-    }
-
-    public String Login(UserLoginDTO userLoginDTO) {
+    public String login(UserLoginDTO userLoginDTO) throws Exception {
         Optional<User> existingUser = this.userRepository
                 .findUsersByPhoneNumber(userLoginDTO.getPhoneNumber());
         if(existingUser.isEmpty()){
             throw new DataNotFoundException("Incorrect phone number or password");
         }
-
+        if(passwordEncoder.matches(userLoginDTO.getPassword().trim(), existingUser.get().getPassword()) ||
+            !userLoginDTO.isPasswordBlank() || userLoginDTO.isFacebookAccountIdValid() || userLoginDTO.isGoogleAccountIdValid()){
+            // trả về JWT token
+            String token = jwtTokenUtils.generateToken(userLoginDTO);
+            return token;
+        }
         return null;
+
     }
 }
