@@ -2,28 +2,33 @@ package com.demo.shopapp.controllers;
 
 import com.demo.shopapp.dtos.CategoryDTO;
 import com.demo.shopapp.entities.Category;
+import com.demo.shopapp.responses.ResponseObject;
 import com.demo.shopapp.services.category.CategorySevice;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
 @RestController
 @RequestMapping("${api.prefix}/categories")
-
+@AllArgsConstructor
 //@Validated
 public class CategoryController {
 
     private final CategorySevice categoryService;
-
-    public CategoryController(CategorySevice categoryService) {
-        this.categoryService = categoryService;
-    }
+    private final MessageSource messageSource;
+    private final LocaleResolver localeResolver;
 
     @PostMapping()
     public ResponseEntity<?> create(
@@ -70,19 +75,26 @@ public class CategoryController {
     }
 
 
-
     @PutMapping("/{id}")
     // nếu tham số truyền vào là 1 object
-    public ResponseEntity<String> update(
+    public ResponseObject<Category> update(
             @PathVariable long id,
-            @Valid @RequestBody CategoryDTO categoryDTO
+            @Valid @RequestBody CategoryDTO categoryDTO, HttpServletRequest request
     ) {
-
-        Category currentCategory = this.categoryService.updateCategory(id, categoryDTO);
-        return
-                ResponseEntity.ok(
-                        "update category with id: " + id + " successfully"
-                );
+        try{
+            Category currentCategory = this.categoryService.updateCategory(id, categoryDTO);
+            Locale locale = localeResolver.resolveLocale(request);
+            return ResponseObject.<Category>builder()
+                    .status(HttpStatus.OK)
+                    .message(messageSource.getMessage("category.update_category.update_successfully", null, locale))
+                    .data(currentCategory)
+                    .build();
+        } catch (Exception e) {
+            return ResponseObject.<Category>builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -93,7 +105,5 @@ public class CategoryController {
                         "delete category with id: " + id + " successfully"
                 );
     }
-
-
 
 }

@@ -88,6 +88,10 @@ public class WebSercurityConfig implements WebMvcConfigurer {
                                             String.format("%s/order_details/**", apiPrefix))
                                     .hasRole(Role.ADMIN)
 
+                                    .requestMatchers(HttpMethod.GET,
+                                            String.format("%s/images/**", apiPrefix))
+                                    .permitAll()
+
                                     .anyRequest().authenticated()
 
                     );

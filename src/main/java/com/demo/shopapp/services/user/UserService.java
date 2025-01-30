@@ -1,6 +1,5 @@
 package com.demo.shopapp.services.user;
 
-
 import com.demo.shopapp.components.JwtTokenUtils;
 import com.demo.shopapp.dtos.UserDTO;
 import com.demo.shopapp.dtos.UserLoginDTO;
@@ -89,6 +88,7 @@ public class UserService implements IUserService {
         if(existingUser.isEmpty()){
             throw new DataNotFoundException("Incorrect phone number or password");
         }
+        // nếu không đăng bằng bằng google or facebook
         if(passwordEncoder.matches(userLoginDTO.getPassword().trim(), existingUser.get().getPassword()) ||
             !userLoginDTO.isPasswordBlank() || userLoginDTO.isFacebookAccountIdValid() || userLoginDTO.isGoogleAccountIdValid()){
             // trả về JWT token

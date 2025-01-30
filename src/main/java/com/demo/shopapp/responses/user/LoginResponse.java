@@ -9,14 +9,13 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class LoginResponse {
-    @JsonProperty("message")
-    private String message;
 
     @JsonProperty("token")
     private String token;
 
     @JsonProperty("refresh_token")
     private String refreshToken;
-    private String tokenType = "Bearer";
 
+    @JsonProperty("token_type")
+    private String tokenType = "Bearer";
 }

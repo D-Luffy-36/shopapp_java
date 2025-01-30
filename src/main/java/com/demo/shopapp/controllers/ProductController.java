@@ -27,12 +27,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-
 @RestController
 @RequestMapping("${api.prefix}/products")
 //@Validated
 public class ProductController {
     private final ProductService productService;
+
+    private static final String UPLOAD_DIR = "uploads/";
 
     public ProductController(ProductService productService) {
         this.productService = productService;
@@ -59,14 +60,12 @@ public class ProductController {
     @GetMapping("/{id}") // id -> path variable lấy id động
     public ResponseEntity<?> detail(@PathVariable("id") long id) {
         try{
-
             Product existingProduct = this.productService.getProductById(id);
             return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
 
         }catch(DataNotFoundException e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
     }
 
     @PostMapping()
@@ -150,7 +149,6 @@ public class ProductController {
         String contentType = file.getContentType();
         return contentType != null && (contentType.startsWith("image/"));
     }
-
 
     @PostMapping(value = "/uploads/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -238,4 +236,5 @@ public class ProductController {
         }
 
     }
+
 }
