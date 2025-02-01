@@ -1,4 +1,5 @@
 package com.demo.shopapp.services.category;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.demo.shopapp.dtos.CategoryDTO;
 import com.demo.shopapp.entities.Category;
@@ -18,6 +19,7 @@ public class CategorySevice implements ICategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    @Transactional
     @Override
     public Category createCategory(CategoryDTO category) throws RuntimeException {
         String name = category.getName().toLowerCase();
@@ -38,6 +40,7 @@ public class CategorySevice implements ICategoryService {
                 () -> new RuntimeException("Category not found"));
     }
 
+    @Transactional
     @Override
     public Category updateCategory(long id, CategoryDTO category) {
         Category currentCategory = getCategoryById(id);
@@ -56,6 +59,11 @@ public class CategorySevice implements ICategoryService {
         return categoryRepository.findAll(pageable).getContent();
     }
 
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
+    @Transactional
     @Override
     public void deleteCategoryById(long id) {
         // soft delete

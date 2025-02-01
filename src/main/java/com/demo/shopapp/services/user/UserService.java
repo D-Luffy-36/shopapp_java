@@ -9,6 +9,7 @@ import com.demo.shopapp.exceptions.DataNotFoundException;
 import com.demo.shopapp.exceptions.PermissionDeniedException;
 import com.demo.shopapp.repositorys.RoleRepository;
 import com.demo.shopapp.repositorys.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ public class UserService implements IUserService {
     private final JwtTokenUtils jwtTokenUtils;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+    @Transactional
     @Override
     public User create(UserDTO userDTO) throws Exception {
         boolean existPhonumber = this.userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());

@@ -11,6 +11,8 @@ import com.demo.shopapp.repositorys.OrderDetailRepository;
 import com.demo.shopapp.repositorys.OrderRepository;
 import com.demo.shopapp.repositorys.ProductRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 
@@ -33,6 +35,7 @@ public class OrderDetailService implements IOrderDetail{
     }
 
 
+    @Transactional
     @Override
     public OrderDetail create(OrderDetailDTO orderDetailDTO) {
         Order existingOrder = this.orderRepository.findById(orderDetailDTO.getOrderId()).orElseThrow(
@@ -47,6 +50,7 @@ public class OrderDetailService implements IOrderDetail{
         return this.orderDetailRepository.save(newOrderDetail);
     }
 
+    @Transactional
     @Override
     public OrderDetail update(Long id, OrderDetailDTO orderDetailDTO) {
         OrderDetail existingOrderDetail = this.orderDetailRepository.findById(id).orElseThrow(
@@ -74,6 +78,7 @@ public class OrderDetailService implements IOrderDetail{
         return this.orderDetailRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Order Detail not found with id: " + id));
     }
 
+    @Transactional
     @Override
     // xóa cứng
     public void delete(long id) {

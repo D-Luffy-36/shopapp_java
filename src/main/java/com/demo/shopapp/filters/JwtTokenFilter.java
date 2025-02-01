@@ -7,7 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,6 +105,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 //                    filterChain.doFilter(request, response);
 //                }
 //            }
+
+        // lỗi Sql có thể ở đây
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set the HTTP response status
 
@@ -112,19 +114,33 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     private boolean isByPassToken(@NonNull HttpServletRequest request) {
+
+        String requestURI = request.getRequestURI();
+        String method = request.getMethod();
+
         final List<Pair<String, String>> byPassTokens = List.of(
                 Pair.of(apiPrefix + "/products", "GET"),
                 Pair.of(apiPrefix + "/categories", "GET"),
                 Pair.of(apiPrefix + "/roles", "GET"),
+                Pair.of(apiPrefix + "/images/", "GET"),
                 Pair.of(apiPrefix + "/users/login", "POST"),
                 Pair.of(apiPrefix + "/users/register", "POST")
         );
 
         for (Pair<String, String> byPassToken : byPassTokens) {
+            String path = request.getServletPath();
+            String httpMethod = request.getMethod();
+
             if(request.getServletPath().contains(byPassToken.getKey())  &&
                     request.getMethod().equals(byPassToken.getValue())  ){
                return true;
             }
+
+            // Nếu request bắt đầu bằng "/images/", cho phép truy cập công khai
+            if (requestURI.startsWith(path)  && method.equalsIgnoreCase(httpMethod)) {
+                return true;
+            }
+
         }
         return false;
     }

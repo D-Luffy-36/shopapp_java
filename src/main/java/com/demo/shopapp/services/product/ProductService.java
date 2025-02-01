@@ -10,6 +10,7 @@ import com.demo.shopapp.exceptions.InvalidParamException;
 import com.demo.shopapp.repositorys.CategoryRepository;
 import com.demo.shopapp.repositorys.ProductImageRepository;
 import com.demo.shopapp.repositorys.ProductRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +32,8 @@ public class ProductService implements IProductService {
         this.categoryRepository = categoryRepository;
         this.productImageRepository = productImageRepository;
     }
+
+    @Transactional
     @Override
     public Product createProduct(ProductDTO productDTO) {
 
@@ -48,14 +51,17 @@ public class ProductService implements IProductService {
         return this.productRepository.save(newProduct);
     }
 
+
     @Override
-    public Page<Product> getAllProducts(int page, int limit) {
+    public Page<Product> getAllProducts(String keyWord, Long category_id ,int page, int limit) {
         if (page <= 0) {
             page = 1; // Đặt giá trị mặc định
         }
 
-        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdAt").descending());
-        return this.productRepository.findAll(pageable);
+        Pageable pageable = PageRequest.of(page - 1, limit,
+//                Sort.by("createdAt").descending()
+                Sort.by("id").ascending());
+        return this.productRepository.searchProducts(keyWord, category_id, pageable);
 
     }
 
@@ -65,6 +71,7 @@ public class ProductService implements IProductService {
                 .orElseThrow(() -> new DataNotFoundException("Product not found with id: " + id));
     }
 
+    @Transactional
     @Override
     public Product updateProduct(Long id, ProductDTO productDTO) {
         Product currentProduct = this.productRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Product not found with id: " + id));
@@ -83,6 +90,7 @@ public class ProductService implements IProductService {
         return this.productRepository.save(currentProduct);
     }
 
+    @Transactional
     @Override
     public void deleteProduct(Long id) {
         // xóa cứng
@@ -90,6 +98,7 @@ public class ProductService implements IProductService {
         this.productRepository.delete(currentProduct);
     }
 
+    @Transactional
     public ProductImage createProductImage(Long productId,
                                            ProductImageDTO productImageDTO ) throws InvalidParamException {
 

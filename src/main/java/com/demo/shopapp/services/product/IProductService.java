@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 
 public interface IProductService {
     Product createProduct(ProductDTO productDTO) throws Exception;
-    Page<Product> getAllProducts(int page, int limit);
+    Page<Product> getAllProducts(String keyWord, Long category_id ,int page, int limit);
 
     Product getProductById(Long id) throws Exception;
     Product updateProduct(Long id, ProductDTO productDTO) throws Exception;

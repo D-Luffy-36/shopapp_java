@@ -1,17 +1,14 @@
 package com.demo.shopapp.controllers;
 
-import com.demo.shopapp.dtos.OrderDTO;
 import com.demo.shopapp.dtos.OrderDetailDTO;
 import com.demo.shopapp.entities.OrderDetail;
 import com.demo.shopapp.mappers.OrderDetailMapper;
 import com.demo.shopapp.responses.ResponseObject;
-import com.demo.shopapp.responses.order.OrderResponse;
 import com.demo.shopapp.responses.orderDetail.OrderDetailResponse;
 import com.demo.shopapp.services.order.OrderService;
 import com.demo.shopapp.services.orderdetail.OrderDetailService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 

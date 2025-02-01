@@ -41,10 +41,12 @@ public class ProductController {
 
     @GetMapping()
     public ResponseEntity<ListProductResponse> list(
+            @RequestParam(defaultValue = "") String keyWord,
+            @RequestParam(name = "category_id", defaultValue = "0") Long categoryId,
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
-        Page<Product> products =  this.productService.getAllProducts(page, limit);
+        Page<Product> products =  this.productService.getAllProducts(keyWord, categoryId, page, limit);
         ListProductResponse listProductResponses =  ListProductResponse.builder()
                 .products(products.getContent()
                 .stream()

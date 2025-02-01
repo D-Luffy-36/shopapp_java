@@ -5,9 +5,12 @@ import com.demo.shopapp.dtos.UserDTO;
 
 import com.demo.shopapp.dtos.UserLoginDTO;
 import com.demo.shopapp.entities.User;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface IUserService {
+
     User create(UserDTO uerDTO) throws Exception;
+
 
     User getUserById(long id) throws Exception;
 
