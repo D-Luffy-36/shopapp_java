@@ -1,5 +1,8 @@
 package com.demo.shopapp.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 
+
 public class ProductImage {
     public static final int MAX_IMAGES = 5;
     @Id
@@ -19,10 +23,12 @@ public class ProductImage {
     private Long id;
 
     @Column(name = "image_url", length = 300)
+    @JsonProperty("image_url")
     private String imageUrl;
 
     @ManyToOne()
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 }
 

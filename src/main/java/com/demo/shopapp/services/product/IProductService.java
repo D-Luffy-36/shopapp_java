@@ -8,6 +8,8 @@ import com.demo.shopapp.entities.ProductImage;
 import com.demo.shopapp.exceptions.InvalidParamException;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface IProductService {
     Product createProduct(ProductDTO productDTO) throws Exception;
     Page<Product> getAllProducts(String keyWord, Long category_id ,int page, int limit);
@@ -17,5 +19,7 @@ public interface IProductService {
     void deleteProduct(Long id) throws Exception;
     ProductImage createProductImage(Long productId, ProductImageDTO productImageDTO) throws InvalidParamException;
 
+    List<ProductImage> getProductImagesByProductId(Long productId) throws Exception;
+    List<Object[]> findProductsByIds(String ids);
 }
 

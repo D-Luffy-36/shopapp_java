@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Getter
@@ -27,6 +27,7 @@ public class OrderDTO {
     @JsonProperty("email")
     @Email(message = "Invalid email format")
     private String email;
+
     @JsonProperty("note")
     @Size(max = 500, message = "Note should not exceed 500 characters")
     private String note;
@@ -40,17 +41,13 @@ public class OrderDTO {
     @NotBlank(message = "phone number is required")
     private String phoneNumber;
 
-    @JsonProperty("total_money")
+    @JsonProperty(value="total_money")
     @Min(value = 0, message = "Total money must be greater than or equal to 0")
-    private Float totalMoney;
+    private Double totalMoney;
 
     @JsonProperty("shipping_method")
     @NotEmpty(message = "Shipping method cannot be empty")
     private String shippingMethod;
-
-    @JsonProperty("shipping_address")
-    @NotEmpty(message = "Shipping address cannot be empty")
-    private String shippingAddress;
 
     @JsonProperty("shipping_date")
     private LocalDateTime shippingDate;
@@ -73,6 +70,9 @@ public class OrderDTO {
 
     @JsonProperty(value = "discount")
     private double discount;
+
+    @JsonProperty("cart_items")
+    private List<CartItemDTO> cartItems;
 }
 
 

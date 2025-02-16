@@ -1,13 +1,14 @@
 package com.demo.shopapp.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 @Entity
 @SuperBuilder
@@ -52,8 +53,8 @@ public class Order extends BaseEntity{
     @Column(name = "shipping_method")
     private String shippingMethod;
 
-    @Column(name = "shipping_address")
-    private String shippingAddress;
+//    @Column(name = "shipping_address")
+//    private String shippingAddress;
 
     @Column(name = "shipping_date")
     private LocalDateTime shippingDate;
@@ -69,25 +70,9 @@ public class Order extends BaseEntity{
     @Column(name = "active")
     private Boolean active;
 
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    List<OrderDetail> orderDetails;
 
 }
 
-//CREATE TABLE [orders] (
-//        [id] BIGINT PRIMARY KEY IDENTITY(1, 1),
-//  [user_id] bigint,
-//        [fullname] varchar(150),
-//  [email] varchar(150),
-//  [phone_number] varchar(20) NOT NULL,
-//  [address] varchar(200) NOT NULL,
-//  [note] varchar(200) DEFAULT ' ',
-//        [order_date] DATETIME DEFAULT 'CURRENT_TIMESTAMP',
-//        [status] VARCHAR(20) NOT NULL CHECK ([status] IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled')),
-//        [total_money] float,
-//        [shipping_method] varchar(100),
-//  [shipping_address] varchar(200),
-//  [shipping_date] date,
-//        [tracking_number] varchar(100),
-//  [payment_method] varchar(100),
-//  [active] BIT DEFAULT (1)
-//)
-//GO

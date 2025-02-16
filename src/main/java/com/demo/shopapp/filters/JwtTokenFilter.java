@@ -14,10 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.*;
@@ -108,13 +105,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // lỗi Sql có thể ở đây
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set the HTTP response status
-
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Đặt mã trạng thái 401
+            response.getWriter().write("Unauthorized: " + e.getMessage()); // Gửi thông báo lỗi chi tiết
+            response.getWriter().flush();
         }
     }
 
-    private boolean isByPassToken(@NonNull HttpServletRequest request) {
 
+    private boolean isByPassToken(@NonNull HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
 
@@ -128,21 +126,49 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         );
 
         for (Pair<String, String> byPassToken : byPassTokens) {
-            String path = request.getServletPath();
-            String httpMethod = request.getMethod();
-
-            if(request.getServletPath().contains(byPassToken.getKey())  &&
-                    request.getMethod().equals(byPassToken.getValue())  ){
-               return true;
-            }
-
-            // Nếu request bắt đầu bằng "/images/", cho phép truy cập công khai
-            if (requestURI.startsWith(path)  && method.equalsIgnoreCase(httpMethod)) {
+            if (requestURI.equals(byPassToken.getKey()) && method.equalsIgnoreCase(byPassToken.getValue())) {
                 return true;
             }
 
+            // Nếu request bắt đầu bằng "/images/", cho phép truy cập công khai
+            if (requestURI.startsWith(byPassToken.getKey()) && method.equalsIgnoreCase(byPassToken.getValue())) {
+                return true;
+            }
         }
         return false;
     }
+
+    // function này có lỗi ngu
+//    private boolean isByPassToken(@NonNull HttpServletRequest request) {
+//
+//        String requestURI = request.getRequestURI();
+//        String method = request.getMethod();
+//
+//        final List<Pair<String, String>> byPassTokens = List.of(
+//                Pair.of(apiPrefix + "/products", "GET"),
+//                Pair.of(apiPrefix + "/categories", "GET"),
+//                Pair.of(apiPrefix + "/roles", "GET"),
+//                Pair.of(apiPrefix + "/images/", "GET"),
+//                Pair.of(apiPrefix + "/users/login", "POST"),
+//                Pair.of(apiPrefix + "/users/register", "POST")
+//        );
+//
+//        for (Pair<String, String> byPassToken : byPassTokens) {
+//            String path = request.getServletPath();
+//            String httpMethod = request.getMethod();
+//
+//            if(request.getServletPath().contains(byPassToken.getKey())  &&
+//                    request.getMethod().equals(byPassToken.getValue())  ){
+//               return true;
+//            }
+//
+//            // Nếu request bắt đầu bằng "/images/", cho phép truy cập công khai
+//            if (requestURI.startsWith(path)  && method.equalsIgnoreCase(httpMethod)) {
+//                return true;
+//            }
+//
+//        }
+//        return false;
+//    }
 
 }

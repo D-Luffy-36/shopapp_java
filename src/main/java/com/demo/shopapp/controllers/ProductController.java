@@ -70,6 +70,27 @@ public class ProductController {
         }
     }
 
+
+    @GetMapping("/find")
+    public Object listProductByIds(@RequestParam("ids") String ids) throws Exception {
+        try{
+            return this.productService.findProductsByIds(ids)
+                    .stream()
+                    .map(row -> ProductResponse.builder()
+                            .id(((Number) row[0]).longValue())  // Ép kiểu về Long
+                            .name((String) row[1])              // Ép kiểu về String
+                            .price(((Number) row[2]).doubleValue()) // Ép kiểu về Double
+                            .thumbnail((String) row[3])         // Ép kiểu về String
+                            .build()
+                    )
+                    .toList();
+
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+
+    }
+
     @PostMapping()
     public ResponseEntity<?> create(@Valid @RequestBody ProductDTO productDTO,
             BindingResult result) {

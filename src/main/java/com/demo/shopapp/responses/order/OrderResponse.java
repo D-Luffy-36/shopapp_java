@@ -1,13 +1,17 @@
 package com.demo.shopapp.responses.order;
 
 import com.demo.shopapp.entities.Order;
+import com.demo.shopapp.mappers.OrderMapper;
 import com.demo.shopapp.responses.BaseResponse;
+import com.demo.shopapp.responses.orderDetail.OrderDetailResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @AllArgsConstructor
@@ -15,7 +19,6 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor
 public class OrderResponse extends BaseResponse {
-
     private Long id;
     @JsonProperty("user_id")
     private Long userId;
@@ -30,17 +33,23 @@ public class OrderResponse extends BaseResponse {
 
     private String note;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonProperty("order_date")
     private LocalDateTime orderDate;
 
     private String status;
 
-    @Column(name = "total_money")
+    @JsonProperty("total_money")
     private Double totalMoney;
     @JsonProperty("shipping_method")
     private String shippingMethod;
-    @JsonProperty("shipping_address")
-    private String shippingAddress;
+
+    @JsonProperty("payment_method")
+    private String paymentMethod;
+//    @JsonProperty("shipping_address")
+//    private String shippingAddress;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     @JsonProperty("shipping_date")
     private LocalDateTime shippingDate;
     @JsonProperty("tracking_number")
@@ -49,6 +58,9 @@ public class OrderResponse extends BaseResponse {
     private double discount;
 
     private Boolean active;
+
+    @JsonProperty("order_details")
+    List<OrderDetailResponse> orderDetailResponses;
 
     public static OrderResponse fromOrder(Order order) {
         OrderResponse orderResponse = OrderResponse.builder()
@@ -63,7 +75,8 @@ public class OrderResponse extends BaseResponse {
                 .status(order.getStatus())
                 .totalMoney(order.getTotalMoney())
                 .shippingMethod(order.getShippingMethod())
-                .shippingAddress(order.getShippingAddress())
+                .paymentMethod(order.getPaymentMethod())
+//                .shippingAddress(order.getShippingAddress())
                 .shippingDate(order.getShippingDate())
                 .trackingNumber(order.getTrackingNumber())
                 .discount(order.getDiscount())

@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Repository
@@ -35,6 +37,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> searchProducts(@Param("keyWord") String keyWord,
                                  @Param("categoryId") Long categoryId,
                                  Pageable pageable);
+    @Query(value = "SELECT p.id, p.name, p.price, p.thumbnail FROM products AS p WHERE p.id IN (:ids) ", nativeQuery = true)
+    List<Object[]> findProductByIds(@Param("ids") List<Long> ids);
 }
 
 

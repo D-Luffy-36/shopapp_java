@@ -1,15 +1,22 @@
 package com.demo.shopapp.responses.product;
 
 import com.demo.shopapp.entities.Product;
+import com.demo.shopapp.entities.ProductImage;
 import com.demo.shopapp.responses.BaseResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductResponse extends BaseResponse {
     private Long id;
 
@@ -23,6 +30,7 @@ public class ProductResponse extends BaseResponse {
 
     private String category;
 
+    List<ProductImage> images;
 
     public static ProductResponse fromProduct(Product product) {
         return ProductResponse.builder()
@@ -32,6 +40,7 @@ public class ProductResponse extends BaseResponse {
                 .price(product.getPrice())
                 .thumbnail(product.getThumbnail())
                 .category(product.getCategory().getName())
+                .images(product.getImages()) // hibernate ganhs
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .build();

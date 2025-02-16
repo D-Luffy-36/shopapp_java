@@ -8,6 +8,7 @@ import lombok.*;
 @Data
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDetailDTO {
@@ -24,30 +25,18 @@ public class OrderDetailDTO {
 
     @JsonProperty("number_of_product")
     @Min(value = 1, message = "number product >= 1")
-    @NotNull
+    @NotNull(message = "number_of_product not null")
     private Integer numberOfProduct;
 
     private String color;
 
+    @JsonProperty("unit_price")
+    @Min(value = 0, message = "unit_price >= 0")
+    @NotNull(message = "unit_price not null")
+    private Float unitPrice;
+
     @JsonProperty("price")
     @Min(value = 0, message = "price >= 0")
-    @NotNull(message = "price not null")
+    @NotNull(message = "unit_price not null")
     private Float price;
-
-    @JsonProperty("total_money")
-    @Min(value = 0, message = "totall >= 0")
-    @NotNull(message = "total money >= 0")
-    private Float totalMoney;
 }
-
-//
-//CREATE TABLE [order_details] (
-//        [id] BIGINT PRIMARY KEY IDENTITY(1, 1),
-//        [order_id] BIGINT,
-//        [product_id] BIGINT,
-//        [price] float,
-//        [number_of_product] int,
-//        [total_money] float,
-//        [color] varchar(20) DEFAULT ''
-//        )
-//GO

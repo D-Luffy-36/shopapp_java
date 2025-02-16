@@ -1,14 +1,16 @@
 package com.demo.shopapp.services.order;
 
 import com.demo.shopapp.dtos.OrderDTO;
-import com.demo.shopapp.entities.Order;
-import com.demo.shopapp.entities.OrderStatus;
-import com.demo.shopapp.entities.User;
+import com.demo.shopapp.entities.*;
 import com.demo.shopapp.exceptions.DataNotFoundException;
 import com.demo.shopapp.mappers.OrderMapper;
+import com.demo.shopapp.repositorys.OrderDetailRepository;
 import com.demo.shopapp.repositorys.OrderRepository;
+import com.demo.shopapp.repositorys.ProductRepository;
 import com.demo.shopapp.repositorys.UserRepository;
 
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,24 +19,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService implements IOrderService {
 
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
-
-    public OrderService(OrderRepository orderRepository,
-                        UserRepository userRepository,
-                        OrderMapper orderMapper) {
-
-        this.orderRepository = orderRepository;
-        this.userRepository = userRepository;
-        this.orderMapper = orderMapper;
-    }
+    private final OrderDetailRepository orderDetailRepository;
 
     @Transactional
     @Override
@@ -49,13 +46,32 @@ public class OrderService implements IOrderService {
         newOrder.setActive(true);
         newOrder.setStatus(OrderStatus.PENDING);
         newOrder.setOrderDate(LocalDateTime.now());
-        // check shipping date >= ngay hom nay
-
-        // đoạn này cần xử lí phức tạp
+        newOrder.setTotalMoney(orderDTO.getTotalMoney());
 
         newOrder.setShippingDate(LocalDateTime.now());
 
-        return this.orderRepository.save(newOrder);
+        newOrder = this.orderRepository.save(newOrder);
+
+        List<OrderDetail> orderDetails = new ArrayList<>();
+
+        for(int i = 0; i < orderDTO.getCartItems().size(); i++) {
+            Product product  = this.productRepository.findById(orderDTO.getCartItems().get(i).getProductId())
+                    .orElseThrow(() -> new DataNotFoundException("Product not found"));
+
+            Integer quantity = orderDTO.getCartItems().get(i).getQuantity();
+            Double price = product.getPrice() * quantity;
+
+            OrderDetail newOrderDetail = OrderDetail.builder()
+                    .order(newOrder)
+                    .product(product)
+                    .numberOfProduct(quantity)
+                    .unitPrice(product.getPrice())
+                    .price(price)
+                    .build();
+            orderDetails.add(newOrderDetail);
+        }
+        orderDetailRepository.saveAll(orderDetails);
+        return newOrder;
     }
 
     @Override

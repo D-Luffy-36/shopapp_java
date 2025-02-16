@@ -3,13 +3,15 @@ package com.demo.shopapp.controllers;
 import com.demo.shopapp.dtos.OrderDTO;
 import com.demo.shopapp.entities.Order;
 
+import com.demo.shopapp.mappers.OrderDetailMapper;
 import com.demo.shopapp.mappers.OrderMapper;
 import com.demo.shopapp.responses.ResponseObject;
 import com.demo.shopapp.responses.order.ListOrderResponse;
 import com.demo.shopapp.responses.order.OrderResponse;
 import com.demo.shopapp.services.order.OrderService;
 import jakarta.validation.Valid;
-import org.aspectj.weaver.ast.Or;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,13 +23,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("${api.prefix}/orders")
+@RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
-    public OrderController(OrderService orderService, OrderMapper orderMapper) {
-        this.orderService = orderService;
-        this.orderMapper = orderMapper;
-    }
+    private final OrderDetailMapper orderDetailMapper;
+
     @GetMapping()
     public ResponseEntity<?> list(
             @RequestParam("page") int page,
@@ -72,6 +73,13 @@ public class OrderController {
         try{
             Order order = this.orderService.getOrderById(id);
             OrderResponse orderResponse = this.orderMapper.toOrderResponse(order);
+
+            orderResponse.setOrderDetailResponses(
+                    order.getOrderDetails()
+                            .stream()
+                            .map(orderDetailMapper::toOrderDetailResponse)
+                            .toList()
+            );
             return   ResponseObject.<OrderResponse>builder()
                         .status(HttpStatus.OK)
                         .data(orderResponse)

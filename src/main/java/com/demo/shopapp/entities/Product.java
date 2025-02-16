@@ -1,8 +1,11 @@
 package com.demo.shopapp.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Entity
 @SuperBuilder
@@ -31,6 +34,9 @@ public class Product extends BaseEntity {
     @JoinColumn(name = "category_id" )
     private Category category;
 
+    @OneToMany(mappedBy = "product", orphanRemoval = true)
+
+    private List<ProductImage> images;
 
 }
 

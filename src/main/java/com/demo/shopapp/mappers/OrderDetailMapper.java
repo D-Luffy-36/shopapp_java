@@ -11,11 +11,10 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface OrderDetailMapper {
 
-    OrderDetail toOrderDetail(OrderDetailDTO orderDetailDTO);
-
-    // Ánh xạ từ OrderDetail sang OrderDetailResponse
-    @Mapping(source = "order.id", target = "orderId")               // Lấy orderId từ đối tượng Order
+    OrderDetail toOrderDetail(OrderDetailDTO orderDetailDTO);// Ánh xạ từ OrderDetail sang OrderDetailResponse
+//    @Mapping(source = "order.id", target = "orderId")               // Lấy orderId từ đối tượng Order
     @Mapping(source = "product.name", target = "productName")
+    @Mapping(source = "product.thumbnail", target = "productThumbnail")
     OrderDetailResponse toOrderDetailResponse(OrderDetail orderDetail);
 
     @Mapping(target = "id", ignore = true) // Không ghi đè id

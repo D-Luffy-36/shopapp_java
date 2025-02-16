@@ -10,6 +10,7 @@ import com.demo.shopapp.exceptions.InvalidParamException;
 import com.demo.shopapp.repositorys.CategoryRepository;
 import com.demo.shopapp.repositorys.ProductImageRepository;
 import com.demo.shopapp.repositorys.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -18,20 +19,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService implements IProductService {
     private final ProductRepository productRepository;
+    private final ProductImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
-
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository,
-                          ProductImageRepository productImageRepository) {
-        this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
-        this.productImageRepository = productImageRepository;
-    }
 
     @Transactional
     @Override
@@ -70,6 +67,21 @@ public class ProductService implements IProductService {
         return this.productRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Product not found with id: " + id));
     }
+
+
+    @Override
+    public List<ProductImage> getProductImagesByProductId(Long productId) {
+        return this.productImageRepository.findByProductId(productId);
+    }
+
+    public List<Object[]> findProductsByIds(String ids) {
+        List<Long> productIds = Arrays.stream(ids.split(","))
+                .map(Long::parseLong)
+                .toList();
+        return this.productRepository.findProductByIds(productIds);
+    }
+
+
 
     @Transactional
     @Override

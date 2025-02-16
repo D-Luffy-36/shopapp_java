@@ -1,5 +1,6 @@
 package com.demo.shopapp.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class OrderDetail {
     // Order Object
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @JsonBackReference
     private Order order;
 
     // product Object
@@ -30,22 +32,12 @@ public class OrderDetail {
     @Column(name = "number_of_product", nullable = false)
     private Integer numberOfProduct;
 
+    @Column(name = "unit_price", nullable = false)
+    private Double unitPrice;
+
     @Column(name = "price", nullable = false)
     private Double price;
-
-    @Column(name = "total_money", nullable = false)
-    private Double totalMoney;
 
     private String color;
 }
 
-//CREATE TABLE [order_details] (
-//        [id] BIGINT PRIMARY KEY IDENTITY(1, 1),
-//        [order_id] BIGINT,
-//        [product_id] BIGINT,
-//        [price] float,
-//        [number_of_product] int,
-//        [total_money] float,
-//        [color] varchar(20) DEFAULT ''
-//        )
-//GO
