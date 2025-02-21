@@ -1,6 +1,7 @@
 package com.demo.shopapp.components;
 
 import com.demo.shopapp.dtos.UserLoginDTO;
+import com.demo.shopapp.entities.User;
 import com.demo.shopapp.repositorys.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -33,22 +34,23 @@ public class JwtTokenUtils {
     private final TokenRepository tokenRepository;
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtils.class);
 
-    public String generateToken(UserLoginDTO userLoginDTO) throws InvalidParameterException {
+    public String generateToken(User user ) throws InvalidParameterException {
         Map<String, Object> claims = new HashMap<>();
 //        this.generateSecretKey();
-        claims.put("phoneNumber", userLoginDTO.getPhoneNumber());
-        claims.put("roleId",userLoginDTO.getRoleId());
+        claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("roleId", (user.getRole() == null) ? 2 : user.getRole().getId());
+        claims.put("userID", user.getId());
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
-                    .setSubject(userLoginDTO.getPhoneNumber())
+                    .setSubject(user.getPhoneNumber())
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
             return token;
 
         }catch (Exception e) {
-            throw new InvalidParameterException("Cannot create jwt token, error: "+ e.getMessage());
+            throw new InvalidParameterException("Cannot create jwt token, error: " + e.getMessage());
         }
     }
 
@@ -83,8 +85,20 @@ public class JwtTokenUtils {
     }
 
     public boolean validateToken(String token, UserDetails userDetails){
+       if (!validateTokenFormat(token)){
+           return false;
+       }
+        //  UserDetails trong Spring Security thường được lưu trong Security Context Holder sau khi người dùng đăng nhập thành công.
         String phoneNumber = extractPhoneNumber(token);
+        // check token = giống trong context holder và chưa hết hạn
         return phoneNumber.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    public boolean validateTokenFormat(String token) {
+        if (token == null || token.isBlank()) {
+            return false;
+        }
+        return true;
     }
 
 

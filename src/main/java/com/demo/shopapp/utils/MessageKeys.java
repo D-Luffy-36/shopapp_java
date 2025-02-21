@@ -2,6 +2,8 @@ package com.demo.shopapp.utils;
 
 public class MessageKeys {
     // user
+
+    public static final String USER_IS_LOCKED = "user.login.user_is_locked";
     public static final String REGISTER_SUCCESSFULLY = "user.register.register_successfully";
     public static final String REGISTER_PASSWORD_NOT_MATCH = "user.register.password_not_match";
 

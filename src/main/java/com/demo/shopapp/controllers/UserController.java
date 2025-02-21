@@ -1,5 +1,6 @@
 package com.demo.shopapp.controllers;
 
+import com.demo.shopapp.components.JwtTokenUtils;
 import com.demo.shopapp.dtos.UserDTO;
 import com.demo.shopapp.dtos.UserLoginDTO;
 import com.demo.shopapp.entities.User;
@@ -15,11 +16,10 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +29,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final LocalizationUtils localizationUtils;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @PostMapping("/register")
     public ResponseObject<?> register(@Valid @RequestBody UserDTO userDTO,
@@ -68,10 +69,12 @@ public class UserController {
                     .build();
         }
     }
+
     @PostMapping("/login")
     public ResponseObject<LoginResponse> login(@Valid @RequestBody UserLoginDTO userLoginDTO) {
         try{
             String token = this.userService.login(userLoginDTO);
+
             return ResponseObject.<LoginResponse>builder()
                     .data(LoginResponse.builder().token(token).build())
                     .message(this.localizationUtils
@@ -80,12 +83,34 @@ public class UserController {
                     .build();
 
         }catch (Exception e){
-            String errorMessage = this.localizationUtils.getLocalizationMessage(MessageKeys.LOGIN_WRONG_PHONE_PASSWORD);
             return ResponseObject.<LoginResponse>builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .message(this.localizationUtils
-                            .getLocalizationMessage(MessageKeys.LOGIN_FAILED, errorMessage))
+                    .status(HttpStatus.NOT_FOUND)
+                    .message(e.getMessage())
                     .build();
         }
     }
+
+    @PostMapping("/details")
+    public ResponseObject<UserResponse> getDetailsUser(
+            @RequestHeader("Authorization") String bearerToken) {
+
+        try{
+            String token = bearerToken.substring(7); // cắt Bearer
+            User user = this.userService.getUserDetailsFromToken(token);
+
+            UserResponse userResponse = UserResponse.fromUser(user);
+
+
+            return ResponseObject.<UserResponse>builder()
+                    .status(HttpStatus.OK)
+                    .data(userResponse)
+                    .build();
+        } catch (Exception e) {
+            return ResponseObject.<UserResponse>builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
+        }
+    }
+
 }
