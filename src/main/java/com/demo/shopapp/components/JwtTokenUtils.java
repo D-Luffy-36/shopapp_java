@@ -1,6 +1,6 @@
 package com.demo.shopapp.components;
 
-import com.demo.shopapp.dtos.UserLoginDTO;
+
 import com.demo.shopapp.entities.User;
 import com.demo.shopapp.repositorys.TokenRepository;
 import io.jsonwebtoken.Claims;
@@ -39,7 +39,7 @@ public class JwtTokenUtils {
 //        this.generateSecretKey();
         claims.put("phoneNumber", user.getPhoneNumber());
         claims.put("roleId", (user.getRole() == null) ? 2 : user.getRole().getId());
-        claims.put("userID", user.getId());
+        claims.put("userId", user.getId());
         try {
             String token = Jwts.builder()
                     .setClaims(claims)

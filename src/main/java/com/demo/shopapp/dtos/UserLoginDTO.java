@@ -23,11 +23,6 @@ public class UserLoginDTO {
     @JsonProperty("password")
     private String password;
 
-    @Min(value = 1, message = "You must enter role's Id")
-    @Max(value = 2)
-    @JsonProperty("role_id")
-    private Long roleId;
-
     // Facebook Account Id, not mandatory, can be blank
     @JsonProperty("facebook_account_id")
     private String facebookAccountId;

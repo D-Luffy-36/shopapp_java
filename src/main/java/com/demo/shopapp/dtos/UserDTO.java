@@ -10,6 +10,8 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
@@ -87,9 +89,7 @@ public class UserDTO {
         return googleAccountId;
     }
 
-    public Long getRoleId() {
-        return roleId;
-    }
+
 
     // Lược bỏ getter cho "password" và "retypePassword" nếu không cần
 }

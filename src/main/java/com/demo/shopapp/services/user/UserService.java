@@ -136,7 +136,7 @@ public class UserService implements IUserService {
         User user =  userRepository.findUsersByPhoneNumber(phoneNumber)
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
 
-        if(user.getIsActive()){
+        if(user.getIsActive() == false){
             throw new AccessDeniedException(localizationUtils.getLocalizationMessage(MessageKeys.USER_IS_LOCKED));
         }
         return user;
