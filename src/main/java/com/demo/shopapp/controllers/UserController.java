@@ -15,6 +15,7 @@ import com.demo.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.validation.BindingResult;
@@ -25,10 +26,12 @@ import java.util.List;
 @RestController
 @RequestMapping("${api.prefix}/users")
 @RequiredArgsConstructor
+
+// jwtFilter đã chec token rồi
 public class UserController {
     private final UserService userService;
     private final LocalizationUtils localizationUtils;
-    private final JwtTokenUtils jwtTokenUtils;
+
 
     @PostMapping("/register")
     public ResponseObject<?> register(@Valid @RequestBody UserDTO userDTO,
@@ -96,10 +99,7 @@ public class UserController {
         try{
             String token = bearerToken.substring(7); // cắt Bearer
             User user = this.userService.getUserDetailsFromToken(token);
-
             UserResponse userResponse = UserResponse.fromUser(user);
-
-
             return ResponseObject.<UserResponse>builder()
                     .status(HttpStatus.OK)
                     .data(userResponse)
@@ -111,5 +111,42 @@ public class UserController {
                     .build();
         }
     }
+
+
+    @PostMapping("/update")
+    public ResponseObject<?> update(
+            @RequestHeader("Authorization") String bearerToken,
+            @Valid @RequestBody UserDTO userDTO,
+                                      BindingResult result) {
+
+        try{
+            if (result.hasErrors()) {
+                List<String> errorMessages = result.getFieldErrors().stream()
+                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                        .toList();
+                // check passWord and retypePassWord
+                return ResponseObject.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(errorMessages.toString())
+                        .build();
+            }
+
+            String token = bearerToken.substring(7);
+            User user = this.userService.UpdateUser(token, userDTO);
+            UserResponse userResponse = UserResponse.fromUser(user);
+
+            return ResponseObject.<UserResponse>builder()
+                    .status(HttpStatus.OK)
+                    .data(userResponse)
+                    .build();
+        } catch (Exception e) {
+            return ResponseObject.<UserResponse>builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .message(e.getMessage())
+                    .build();
+        }
+
+    }
+
 
 }

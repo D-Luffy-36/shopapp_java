@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-    @JsonProperty("fullname")
+    @JsonProperty("full_name")
     private String fullName;
 
     @NotBlank(message = "phone number is required")
@@ -33,6 +33,7 @@ public class UserDTO {
     @JsonProperty("retype_password")
     private String retypePassword;
 
+    // boolean mặc định là false
     @JsonProperty("is_active")
     private boolean isActive;
 
@@ -48,7 +49,7 @@ public class UserDTO {
     @Column(unique = true)
     private String googleAccountId;
 
-    @NotNull(message = "role id is required")
+//    @NotNull(message = "role id is required")
     @JsonProperty("role_id")
     private Long roleId;
 

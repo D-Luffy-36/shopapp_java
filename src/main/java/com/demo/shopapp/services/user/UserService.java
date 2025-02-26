@@ -7,6 +7,7 @@ import com.demo.shopapp.dtos.UserLoginDTO;
 import com.demo.shopapp.entities.Role;
 import com.demo.shopapp.entities.User;
 import com.demo.shopapp.exceptions.DataNotFoundException;
+import com.demo.shopapp.exceptions.InvalidParamException;
 import com.demo.shopapp.exceptions.PermissionDeniedException;
 import com.demo.shopapp.repositorys.RoleRepository;
 import com.demo.shopapp.repositorys.UserRepository;
@@ -140,6 +141,37 @@ public class UserService implements IUserService {
             throw new AccessDeniedException(localizationUtils.getLocalizationMessage(MessageKeys.USER_IS_LOCKED));
         }
         return user;
+    }
+
+
+
+    public String getCurrentUserPhoneNumber() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            return ((User) authentication.getPrincipal()).getPhoneNumber();
+        }
+        return null;
+    }
+
+
+    public User UpdateUser(String token, UserDTO userDTO) throws Exception {
+        User user = this.getUserDetailsFromToken(token); // chọc vào repository
+        String phoneNumberFromContextHolder = this.getCurrentUserPhoneNumber();
+        if(phoneNumberFromContextHolder == null || !phoneNumberFromContextHolder.equals(user.getPhoneNumber())){
+            throw new com.demo.shopapp.exceptions.AccessDeniedException("Phone number does not match current account");
+        }
+
+        if(!userDTO.getPassword().equals(userDTO.getRetypePassword())){
+            throw new InvalidParamException("pass word not match");
+        }
+
+        user.setPhoneNumber(userDTO.getPhoneNumber());
+        user.setFullName(userDTO.getFullName());
+        user.setDateOfBirth(userDTO.getDateOfBirth());
+        user.setAddress(userDTO.getAddress());
+        user.setPassword(userDTO.getPassword());
+        return this.userRepository.save(user);
     }
 
 

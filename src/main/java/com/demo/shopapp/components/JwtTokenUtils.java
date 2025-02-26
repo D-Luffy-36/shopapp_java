@@ -1,6 +1,5 @@
 package com.demo.shopapp.components;
 
-
 import com.demo.shopapp.entities.User;
 import com.demo.shopapp.repositorys.TokenRepository;
 import io.jsonwebtoken.Claims;
