@@ -1,8 +1,8 @@
-package com.demo.shopapp.responses.user;
+package com.demo.shopapp.dtos.responses.user;
 
 import com.demo.shopapp.entities.Role;
 import com.demo.shopapp.entities.User;
-import com.demo.shopapp.responses.BaseResponse;
+import com.demo.shopapp.dtos.responses.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,6 +10,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Getter
@@ -47,8 +50,8 @@ public class UserResponse extends BaseResponse {
     @JsonProperty("google_account_id")
     private String googleAccountId;
 
-    @JsonProperty("role")
-    private Role role;
+    @JsonProperty("roles")
+    private Set<String> roles = new HashSet<>();
 
     public static UserResponse fromUser(User user) {
         return UserResponse.builder()
@@ -61,7 +64,11 @@ public class UserResponse extends BaseResponse {
                 .dateOfBirth(LocalDate.from(user.getDateOfBirth()))
                 .facebookAccountId(user.getFaceBookAccountId())
                 .googleAccountId(user.getGoogleAccountId())
-                .role(user.getRole())
+                .roles(
+                        user.getRoles().stream()
+                                .map(Role::getName)
+                                .collect(Collectors.toSet())
+                )
                 .build();
     }
 }

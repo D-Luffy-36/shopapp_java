@@ -1,7 +1,7 @@
 package com.demo.shopapp.services.category;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.demo.shopapp.dtos.CategoryDTO;
+import com.demo.shopapp.dtos.request.CategoryDTO;
 import com.demo.shopapp.entities.Category;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

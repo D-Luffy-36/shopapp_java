@@ -1,7 +1,7 @@
 package com.demo.shopapp.controllers;
 
 import com.demo.shopapp.entities.Role;
-import com.demo.shopapp.responses.ResponseObject;
+import com.demo.shopapp.dtos.responses.ResponseObject;
 import com.demo.shopapp.services.role.RoleService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

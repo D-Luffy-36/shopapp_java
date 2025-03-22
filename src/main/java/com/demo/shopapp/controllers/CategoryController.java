@@ -1,8 +1,8 @@
 package com.demo.shopapp.controllers;
 
-import com.demo.shopapp.dtos.CategoryDTO;
+import com.demo.shopapp.dtos.request.CategoryDTO;
 import com.demo.shopapp.entities.Category;
-import com.demo.shopapp.responses.ResponseObject;
+import com.demo.shopapp.dtos.responses.ResponseObject;
 import com.demo.shopapp.services.category.CategorySevice;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

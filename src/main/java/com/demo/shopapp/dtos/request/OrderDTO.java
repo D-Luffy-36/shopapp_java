@@ -1,4 +1,4 @@
-package com.demo.shopapp.dtos;
+package com.demo.shopapp.dtos.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;

@@ -1,23 +1,23 @@
-package com.demo.shopapp.responses.order;
+package com.demo.shopapp.dtos.responses.order;
 
 import com.demo.shopapp.entities.Order;
-import com.demo.shopapp.mappers.OrderMapper;
-import com.demo.shopapp.responses.BaseResponse;
-import com.demo.shopapp.responses.orderDetail.OrderDetailResponse;
+import com.demo.shopapp.dtos.responses.BaseResponse;
+import com.demo.shopapp.dtos.responses.orderDetail.OrderDetailResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
-@Data
 @SuperBuilder
 @NoArgsConstructor
+@Getter
+@Setter
 public class OrderResponse extends BaseResponse {
     private Long id;
     @JsonProperty("user_id")
@@ -83,6 +83,11 @@ public class OrderResponse extends BaseResponse {
                 .active(order.getActive())
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
+                .orderDetailResponses(
+                        order.getOrderDetails().stream()
+                                .map(OrderDetailResponse::fromOrderDetail) // Chuyển đổi sang DTO
+                                .collect(Collectors.toList())
+                )
                 .build();
         return orderResponse;
     }

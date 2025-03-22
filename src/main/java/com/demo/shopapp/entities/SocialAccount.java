@@ -32,17 +32,4 @@ public class SocialAccount {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
 }
-
-
-
-//CREATE TABLE [social_accounts] (
-//        [id] BIGINT PRIMARY KEY IDENTITY(1, 1),
-//      [provider] varchar(50) NOT NULL,
-//      [provider_id] varchar(50) NOT NULL,
-//      [email] varchar(150) NOT NULL,
-//      [name] varchar(100) NOT NULL,
-//      [user_id] BIGINT
-//)
-//GO

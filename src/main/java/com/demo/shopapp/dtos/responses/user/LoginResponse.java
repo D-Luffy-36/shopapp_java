@@ -1,4 +1,4 @@
-package com.demo.shopapp.responses.user;
+package com.demo.shopapp.dtos.responses.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

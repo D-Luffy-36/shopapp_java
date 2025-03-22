@@ -1,12 +1,12 @@
 package com.demo.shopapp.controllers;
 
-import com.demo.shopapp.dtos.ProductDTO;
-import com.demo.shopapp.dtos.ProductImageDTO;
+import com.demo.shopapp.dtos.request.ProductDTO;
+import com.demo.shopapp.dtos.request.ProductImageDTO;
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
 import com.demo.shopapp.exceptions.DataNotFoundException;
-import com.demo.shopapp.responses.product.ListProductResponse;
-import com.demo.shopapp.responses.product.ProductResponse;
+import com.demo.shopapp.dtos.responses.product.ListProductResponse;
+import com.demo.shopapp.dtos.responses.product.ProductResponse;
 import com.demo.shopapp.services.product.ProductService;
 
 import com.github.javafaker.Faker;

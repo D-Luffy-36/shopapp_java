@@ -1,7 +1,6 @@
-package com.demo.shopapp.dtos;
+package com.demo.shopapp.dtos.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 @Data

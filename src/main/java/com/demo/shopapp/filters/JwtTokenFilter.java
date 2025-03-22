@@ -55,7 +55,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
                 return;
             }
-            // lấy giá trị của header HTTP với tên "Authorization" từ request
+            // lấy giá trị của header HTTP với tên "Authorization" từ requestfinal String authHeader = request.getHeader("Authorization");
             final String authHeader = request.getHeader("Authorization");
             final String token = authHeader.substring(7);
             final String phoneNumber = jwtTokenUtils.extractPhoneNumber(token);

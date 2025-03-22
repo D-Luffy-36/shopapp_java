@@ -1,9 +1,9 @@
 package com.demo.shopapp.mappers;
 
-import com.demo.shopapp.dtos.OrderDetailDTO;
+import com.demo.shopapp.dtos.request.OrderDetailDTO;
 
 import com.demo.shopapp.entities.OrderDetail;
-import com.demo.shopapp.responses.orderDetail.OrderDetailResponse;
+import com.demo.shopapp.dtos.responses.orderDetail.OrderDetailResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

@@ -1,7 +1,7 @@
 package com.demo.shopapp.services.product;
 
-import com.demo.shopapp.dtos.ProductDTO;
-import com.demo.shopapp.dtos.ProductImageDTO;
+import com.demo.shopapp.dtos.request.ProductDTO;
+import com.demo.shopapp.dtos.request.ProductImageDTO;
 
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;

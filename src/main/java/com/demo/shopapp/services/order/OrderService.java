@@ -1,6 +1,6 @@
 package com.demo.shopapp.services.order;
 
-import com.demo.shopapp.dtos.OrderDTO;
+import com.demo.shopapp.dtos.request.OrderDTO;
 import com.demo.shopapp.entities.*;
 import com.demo.shopapp.exceptions.DataNotFoundException;
 import com.demo.shopapp.mappers.OrderMapper;
@@ -148,5 +148,14 @@ public class OrderService implements IOrderService {
                     .toList();
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public Page<Order> searchOrders(String keyWord, int page, int limit) {
+        if (page <= 0) {
+            page = 1; // Đặt giá trị mặc định
+        }
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdAt").descending());
+        return this.orderRepository.findByKeyWord(keyWord, pageable);
     }
 }

@@ -18,6 +18,7 @@ import java.security.InvalidParameterException;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -37,8 +38,14 @@ public class JwtTokenUtils {
         Map<String, Object> claims = new HashMap<>();
 //        this.generateSecretKey();
         claims.put("phoneNumber", user.getPhoneNumber());
-        claims.put("roleId", (user.getRole() == null) ? 2 : user.getRole().getId());
         claims.put("userId", user.getId());
+
+        // Lưu danh sách roleNames vào token
+        List<String> roleNames = user.getRoles().stream()
+                .map(role -> role.getName())
+                .toList();
+        claims.put("roles", roleNames);
+
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
@@ -75,6 +82,10 @@ public class JwtTokenUtils {
 
     public String extractPhoneNumber(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public Long  extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Long.class));
     }
 
     public boolean isTokenExpired(String token) {

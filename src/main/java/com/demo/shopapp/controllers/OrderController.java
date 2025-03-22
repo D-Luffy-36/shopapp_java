@@ -1,13 +1,13 @@
 package com.demo.shopapp.controllers;
 
-import com.demo.shopapp.dtos.OrderDTO;
+import com.demo.shopapp.dtos.request.OrderDTO;
 import com.demo.shopapp.entities.Order;
 
 import com.demo.shopapp.mappers.OrderDetailMapper;
 import com.demo.shopapp.mappers.OrderMapper;
-import com.demo.shopapp.responses.ResponseObject;
-import com.demo.shopapp.responses.order.ListOrderResponse;
-import com.demo.shopapp.responses.order.OrderResponse;
+import com.demo.shopapp.dtos.responses.ResponseObject;
+import com.demo.shopapp.dtos.responses.order.ListOrderResponse;
+import com.demo.shopapp.dtos.responses.order.OrderResponse;
 import com.demo.shopapp.services.order.OrderService;
 import jakarta.validation.Valid;
 
@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,20 +30,24 @@ public class OrderController {
     private final OrderMapper orderMapper;
     private final OrderDetailMapper orderDetailMapper;
 
-    @GetMapping()
-    public ResponseEntity<?> list(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
-    ) {
-        Page<Order> orders =  this.orderService.getAllOrdersWithActive(page, limit);
 
-        ListOrderResponse listOrderResponse =  ListOrderResponse.builder()
+    // just admin can see all orders
+    @GetMapping()
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> list(
+            @RequestParam (value = "keyWord", required = false, defaultValue = "") String keyWord,
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "limit", required = false, defaultValue = "10") int limit
+    ) {
+        Page<Order> orders =  this.orderService.searchOrders(keyWord, page, limit);
+
+        ListOrderResponse listOrderResponse = ListOrderResponse.builder()
                 .orders(orders.getContent()
                         .stream()
                         .map(order -> orderMapper.toOrderResponse(order))
                         .toList())
                 .totalPages(orders.getTotalPages())
-                        .build();
+                .build();
 
         return ResponseEntity.ok(listOrderResponse);
     }

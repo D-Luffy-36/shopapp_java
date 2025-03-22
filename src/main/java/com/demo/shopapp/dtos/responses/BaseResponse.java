@@ -1,4 +1,4 @@
-package com.demo.shopapp.responses;
+package com.demo.shopapp.dtos.responses;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;

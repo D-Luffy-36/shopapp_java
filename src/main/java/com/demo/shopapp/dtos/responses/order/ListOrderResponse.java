@@ -1,4 +1,4 @@
-package com.demo.shopapp.responses.order;
+package com.demo.shopapp.dtos.responses.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

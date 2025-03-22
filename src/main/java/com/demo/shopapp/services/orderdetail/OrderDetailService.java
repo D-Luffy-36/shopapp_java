@@ -1,6 +1,6 @@
 package com.demo.shopapp.services.orderdetail;
 
-import com.demo.shopapp.dtos.OrderDetailDTO;
+import com.demo.shopapp.dtos.request.OrderDetailDTO;
 import com.demo.shopapp.entities.Order;
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.OrderDetail;

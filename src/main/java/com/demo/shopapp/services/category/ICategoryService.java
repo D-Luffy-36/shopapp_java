@@ -1,6 +1,6 @@
 package com.demo.shopapp.services.category;
 
-import com.demo.shopapp.dtos.CategoryDTO;
+import com.demo.shopapp.dtos.request.CategoryDTO;
 import com.demo.shopapp.entities.Category;
 
 import java.util.List;

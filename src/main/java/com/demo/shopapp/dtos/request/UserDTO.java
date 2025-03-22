@@ -1,13 +1,13 @@
-package com.demo.shopapp.dtos;
+package com.demo.shopapp.dtos.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Builder
 @Getter
@@ -49,9 +49,9 @@ public class UserDTO {
     @Column(unique = true)
     private String googleAccountId;
 
-//    @NotNull(message = "role id is required")
-    @JsonProperty("role_id")
-    private Long roleId;
+
+    @JsonProperty("roles")
+    private Set<String> roleNames;
 
     // Sử dụng phương thức getter duy nhất
     public String getFullName() {

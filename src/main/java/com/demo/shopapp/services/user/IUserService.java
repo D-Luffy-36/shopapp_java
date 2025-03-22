@@ -1,20 +1,21 @@
 package com.demo.shopapp.services.user;
 
 
-import com.demo.shopapp.dtos.UserDTO;
+import com.demo.shopapp.dtos.request.UserDTO;
 
-import com.demo.shopapp.dtos.UserLoginDTO;
+import com.demo.shopapp.dtos.request.UserLoginDTO;
 import com.demo.shopapp.entities.User;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
 
 public interface IUserService {
 
-    User create(UserDTO uerDTO) throws Exception;
-
+    User create(UserDTO uerDTO, boolean isAdmin) throws Exception;
 
     User getUserById(long id) throws Exception;
 
     String login(UserLoginDTO userLoginDTO) throws Exception;
+
+    Page<User> searchUsers(String keyWord, int page, int limit) ;
 }
 
 

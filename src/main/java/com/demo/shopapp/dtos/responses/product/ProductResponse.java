@@ -1,14 +1,12 @@
-package com.demo.shopapp.responses.product;
+package com.demo.shopapp.dtos.responses.product;
 
 import com.demo.shopapp.entities.Product;
 import com.demo.shopapp.entities.ProductImage;
-import com.demo.shopapp.responses.BaseResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.demo.shopapp.dtos.responses.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter

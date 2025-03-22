@@ -1,7 +1,7 @@
 package com.demo.shopapp.services.order;
 
 
-import com.demo.shopapp.dtos.OrderDTO;
+import com.demo.shopapp.dtos.request.OrderDTO;
 import com.demo.shopapp.entities.Order;
 import org.springframework.data.domain.Page;
 
@@ -14,6 +14,7 @@ public interface IOrderService {
     Order updateOrder(long id, OrderDTO orderDTO) throws Exception;
     void deleteOrder(long id);
     List<Order> getOrdersByUserId(long id);
+    Page<Order> searchOrders(String keyWord, int page, int limit);
 }
 
 //
