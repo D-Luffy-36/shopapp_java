@@ -36,6 +36,7 @@ public class JwtTokenUtils {
         Map<String, Object> claims = new HashMap<>();
 //        this.generateSecretKey();
         claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("email", user.getEmail());
         claims.put("userId", user.getId());
 
         // Lưu danh sách roleNames vào token
@@ -47,7 +48,7 @@ public class JwtTokenUtils {
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
-                    .setSubject(user.getPhoneNumber())
+                    .setSubject( user.getEmail() == null ? user.getPhoneNumber() : user.getEmail()) // ưu tiên email
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
@@ -82,6 +83,10 @@ public class JwtTokenUtils {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public String extractEmail(String token) {
+        return extractClaim(token, claims -> claims.get("email", String.class));
+    }
+
     public Long  extractUserId(String token) {
         return extractClaim(token, claims -> claims.get("userId", Long.class));
     }
@@ -91,6 +96,16 @@ public class JwtTokenUtils {
         // expirationDate mà bé hơn ngày hiện tại => hết hạn rồi
         return expirationDate.before(new Date());
     }
+
+    public String extractIdentifier(String token) {
+        Claims claims = extractAllClaims(token);
+
+        // Ưu tiên lấy email, nếu không có thì lấy số điện thoại
+        return claims.get("email", String.class) != null
+                ? claims.get("email", String.class)
+                : claims.get("phoneNumber", String.class);
+    }
+
 
     // check thu hồi
     public boolean isTokenRevoke(String token){

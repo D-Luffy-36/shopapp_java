@@ -22,9 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
 
@@ -32,8 +32,10 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -46,33 +48,47 @@ public class UserService implements IUserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final LocalizationUtils localizationUtils;
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
+    private static final Pattern PHONE_PATTERN = Pattern.compile("^(\\+84|0)[3|5|7|8|9][0-9]{8}$"); // Số VN
+
     @Transactional
     @Override
     public User create(UserDTO userDTO, boolean isAdmin) throws Exception {
+
+        // check phone đã tồn tại chưa
         boolean existPhonumber = this.userRepository.existsByPhoneNumber(userDTO.getPhoneNumber());
         if (existPhonumber) {
-            throw new RuntimeException("existed phone number");
+            throw new RuntimeException("existed phone number: " + userDTO.getPhoneNumber());
+        }
+        // check email tồn tại chưa
+        boolean existEmail = this.userRepository.existsByEmail(userDTO.getEmail());
+        if(existEmail){
+            throw new RuntimeException("existed email: " + userDTO.getEmail());
         }
 
         Set<Role> roles = new HashSet<>();
-        if (isAdmin){
-            for (String roleName : userDTO.getRoleNames()) {
-                Role role = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role " + roleName + " not found"));
-                roles.add(role);
+        Role defaultRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new DataNotFoundException("Role USER not found"));
+
+        Set<String> roleNames = userDTO.getRoleNames() != null ? userDTO.getRoleNames() : Set.of();
+
+        if (isAdmin && !roleNames.isEmpty()) {
+            List<Role> foundRoles = roleRepository.findByNameIn(roleNames);
+            if (foundRoles.size() != roleNames.size()) {
+                throw new DataNotFoundException("One or more roles not found");
             }
-        }else {
-            for (String roleName : userDTO.getRoleNames()) {
-                Role role = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role " + roleName + " not found"));
-                roles.add(role);
-            }
+            roles.addAll(foundRoles);
+        } else {
+            roles.add(defaultRole);
         }
+
+
 
 
         // tao đăng nhập mạng xã hội
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
+                .email(userDTO.getEmail())
                 .phoneNumber(userDTO.getPhoneNumber())
                 .dateOfBirth(userDTO.getDateOfBirth())
                 .address(userDTO.getAddress())
@@ -115,11 +131,18 @@ public class UserService implements IUserService {
         // ưu tiên xóa token của các thiet bi khong phai cua mobile
         String userAgent = request.getHeader("User-Agent");
         System.out.println(userAgent);
-        Optional<User> existingUser = this.userRepository
-                .findUsersByPhoneNumber(userLoginDTO.getPhoneNumber());
 
+        Optional<User> existingUser;
+        String email = userLoginDTO.getEmail();
+        String phone = userLoginDTO.getPhoneNumber();
+
+        if (EMAIL_PATTERN.matcher(email).matches()) {
+            existingUser = this.userRepository.findByEmail(email);
+        }else{
+            existingUser = this.userRepository.findUsersByPhoneNumber(phone);
+        }
         if(existingUser.isEmpty()){
-            throw new DataNotFoundException("Incorrect phone number or password");
+            throw new DataNotFoundException("user not found");
         }
 
         // tài khoản bị khóa
@@ -130,7 +153,6 @@ public class UserService implements IUserService {
         // nếu không đăng bằng bằng google or facebook
         if(passwordEncoder.matches(userLoginDTO.getPassword().trim(), existingUser.get().getPassword()) ||
             !userLoginDTO.isPasswordBlank() || userLoginDTO.isFacebookAccountIdValid() || userLoginDTO.isGoogleAccountIdValid()){
-
 
             String token = jwtTokenUtils.generateToken(existingUser.get());
             // lưu token

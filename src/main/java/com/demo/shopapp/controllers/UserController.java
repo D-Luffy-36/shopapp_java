@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import java.util.regex.Pattern;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final LocalizationUtils localizationUtils;
+
 
 
     @PostMapping("/register")
@@ -116,12 +118,23 @@ public class UserController {
         }
     }
 
-
-
-
     @PostMapping("/login")
-    public ResponseObject<LoginResponse> login(@Valid @RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
+    public ResponseObject<?> login(@Valid @RequestBody UserLoginDTO userLoginDTO,
+                                               HttpServletRequest request,
+                                               BindingResult result
+    ) {
         try{
+            if (result.hasErrors()) {
+                List<String> errorMessages = result.getFieldErrors().stream()
+                        .map(FieldError -> FieldError.getDefaultMessage())
+                        .toList();
+                // check passWord and retypePassWord
+                return ResponseObject.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(errorMessages.toString())
+                        .build();
+            }
+
             Token token = this.userService.login(userLoginDTO, request);
 
             return ResponseObject.<LoginResponse>builder()
@@ -177,10 +190,14 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_STAFF') or hasRole('ROLE_USER')")
     @PutMapping("/update")
-    public ResponseObject<?> updateOwnProfile(@RequestBody UserDTO userDTO, @RequestHeader("Authorization") String bearerToken) {
+    public ResponseObject<?> updateOwnProfile(@RequestBody UserDTO userDTO,
+                                              @RequestHeader("Authorization") String bearerToken,
+                                              BindingResult result
+    ) {
         try {
 
             User updatedUser = userService.updateUserProfile(bearerToken, userDTO);
+
             return ResponseObject.builder()
                     .status(HttpStatus.OK)
                     .data(UserResponse.fromUser(updatedUser))

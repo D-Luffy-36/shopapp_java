@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Builder
@@ -15,21 +16,24 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
+
     @JsonProperty("full_name")
     private String fullName;
 
-    @NotBlank(message = "phone number is required")
     @JsonProperty("phone_number")
     private String phoneNumber;
+
+    @JsonProperty("email")
+    private String email;
 
     @JsonProperty("address")
     private String address;
 
-    @NotBlank(message = "pass word can not be blank")
+    @NotBlank(message = "password can not be blank")
     @JsonProperty("password")
     private String password;
 
-    @NotBlank(message = "pass word can not be blank")
+    @NotBlank(message = "password can not be blank")
     @JsonProperty("retype_password")
     private String retypePassword;
 
@@ -51,7 +55,7 @@ public class UserDTO {
 
 
     @JsonProperty("roles")
-    private Set<String> roleNames;
+    private Set<String> roleNames = new HashSet<>();
 
     // Sử dụng phương thức getter duy nhất
     public String getFullName() {
@@ -90,6 +94,9 @@ public class UserDTO {
         return googleAccountId;
     }
 
+    public String getEmail() {
+        return email;
+    }
 
 
     // Lược bỏ getter cho "password" và "retypePassword" nếu không cần

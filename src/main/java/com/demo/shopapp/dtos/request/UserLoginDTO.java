@@ -13,9 +13,11 @@ import lombok.*;
 @AllArgsConstructor
 public class UserLoginDTO {
 
-    @NotBlank(message = "phone number is required")
     @JsonProperty("phone_number")
     private String phoneNumber;
+
+    @JsonProperty("email")
+    private String email; // Email hoặc SĐT
 
     @NotBlank(message = "pass word can not be blank")
     @JsonProperty("password")

@@ -78,8 +78,6 @@ public class User extends BaseEntity implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-
-
     public void setPassword(String password) {
         this.password = password;
     }

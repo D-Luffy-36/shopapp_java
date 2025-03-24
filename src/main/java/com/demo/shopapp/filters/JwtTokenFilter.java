@@ -58,16 +58,15 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // lấy giá trị của header HTTP với tên "Authorization" từ requestfinal String authHeader = request.getHeader("Authorization");
             final String authHeader = request.getHeader("Authorization");
             final String token = authHeader.substring(7);
-            final String phoneNumber = jwtTokenUtils.extractPhoneNumber(token);
+            final String identifier = jwtTokenUtils.extractIdentifier(token); // Lấy email hoặc phone từ token
 
             if(authHeader == null && !authHeader.startsWith("Bearer ")) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             }
 
-
-            if (phoneNumber != null
+            if (identifier != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
-                User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
+                User userDetails = (User) userDetailsService.loadUserByUsername(identifier);
                 if(jwtTokenUtils.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(
@@ -80,29 +79,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response); //enable bypass
-
-
-            // nếu chưa xác thực nhận request auth
-
-//            if ((authHeader != null) && authHeader.startsWith("Bearer ") ) {
-//                // Xử lý xác thực nếu chưa có thông tin Authentication trong Security Context
-//                final String token = authHeader.substring(7);
-//                // giải mã token -> phone number
-//                final String phoneNumber = jwtTokenUtils.extractPhoneNumber(token);
-//                if (phoneNumber != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-//                    UserDetails userDetails =  userDetailsService.loadUserByUsername(phoneNumber);
-//                    if(jwtTokenUtils.validateToken(token, userDetails)) {
-//                        UsernamePasswordAuthenticationToken authenticationToken =
-//                                new UsernamePasswordAuthenticationToken(userDetails,
-//                                        null,
-//                                        userDetails.getAuthorities());
-//                        authenticationToken.setDetails(new
-//                                WebAuthenticationDetailsSource().buildDetails(request));
-//                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//                    }
-//                    filterChain.doFilter(request, response);
-//                }
-//            }
 
         // lỗi Sql có thể ở đây
         } catch (Exception e) {
