@@ -1,5 +1,6 @@
 # Cấu hình chung
 server:
+  url: http://localhost:8080
   port: 8080  # Cổng của ứng dụng
   servlet:
     encoding:
@@ -18,6 +19,11 @@ spring:
     jackson:
       date-format: yyyy-MM-dd'T'HH:mm:ss.SSS
       time-zone: UTC
+
+  web:
+    resources:
+      static-locations: file:/uploads/
+
 
   mvc:
     charset: UTF-8
@@ -46,6 +52,19 @@ spring:
       enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: contactwork004@gmail.com
+    password: fctk himv rens tdgb
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 
 api:
   prefix: /api/v1

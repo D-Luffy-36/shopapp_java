@@ -50,11 +50,14 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "email", unique = true)
+    private String email;
+
     // ảnh đại diện của user
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

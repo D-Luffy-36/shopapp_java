@@ -3,6 +3,7 @@ package com.demo.shopapp.controllers;
 import com.demo.shopapp.dtos.request.UserDTO;
 import com.demo.shopapp.dtos.request.UserLoginDTO;
 import com.demo.shopapp.dtos.request.AdminUserUpdateRequest;
+import com.demo.shopapp.entities.Token;
 import com.demo.shopapp.entities.User;
 
 import com.demo.shopapp.dtos.responses.ResponseObject;
@@ -13,6 +14,7 @@ import com.demo.shopapp.services.user.UserService;
 import com.demo.shopapp.components.LocalizationUtils;
 
 import com.demo.shopapp.utils.MessageKeys;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -118,12 +120,16 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseObject<LoginResponse> login(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+    public ResponseObject<LoginResponse> login(@Valid @RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
         try{
-            String token = this.userService.login(userLoginDTO);
+            Token token = this.userService.login(userLoginDTO, request);
 
             return ResponseObject.<LoginResponse>builder()
-                    .data(LoginResponse.builder().token(token).build())
+                    .data(LoginResponse.builder()
+                            .token(token.getToken())
+                            .refreshToken(token.getRefreshToken())
+                            .tokenType(token.getTokenType())
+                            .build())
                     .message(this.localizationUtils
                             .getLocalizationMessage(MessageKeys.LOGIN_SUCCESFULLY))
                     .status(HttpStatus.OK)

@@ -4,7 +4,9 @@ package com.demo.shopapp.services.user;
 import com.demo.shopapp.dtos.request.UserDTO;
 
 import com.demo.shopapp.dtos.request.UserLoginDTO;
+import com.demo.shopapp.entities.Token;
 import com.demo.shopapp.entities.User;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 
 public interface IUserService {
@@ -13,7 +15,7 @@ public interface IUserService {
 
     User getUserById(long id) throws Exception;
 
-    String login(UserLoginDTO userLoginDTO) throws Exception;
+    Token login(UserLoginDTO userLoginDTO, HttpServletRequest request) throws Exception;
 
     Page<User> searchUsers(String keyWord, int page, int limit) ;
 }

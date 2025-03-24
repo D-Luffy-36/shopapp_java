@@ -126,6 +126,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(apiPrefix + "/users/register", "POST")
         );
 
+
         for (Pair<String, String> byPassToken : byPassTokens) {
             if (requestURI.equals(byPassToken.getKey()) && method.equalsIgnoreCase(byPassToken.getValue())) {
                 return true;

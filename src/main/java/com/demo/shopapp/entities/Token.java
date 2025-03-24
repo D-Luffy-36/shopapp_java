@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+
+// login có giới hạn thiết bị
+
 @Getter
 @Setter
 @ToString
@@ -12,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "social_accounts")
+@Table(name = "tokens")
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +24,17 @@ public class Token {
     @Column(name = "token", nullable = false, unique = true, length = 255)
     private String token;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
+    @Column(name = "refresh_expiration_date")
+    private LocalDateTime refreshExpirationDate;
+
     @Column(name = "token_type",nullable = false ,length = 50)
     private String tokenType;
+
+    @Column(name = "is_mobile")
+    private Boolean isMobile;
 
     @Column(name = "expiration_date")
     private LocalDateTime expirationDate;
@@ -37,15 +49,3 @@ public class Token {
     @JoinColumn(name = "user_id")
     private User user;
 }
-
-//
-//CREATE TABLE [tokens] (
-//        [id] BIGINT PRIMARY KEY IDENTITY(1, 1),
-//  [token] varchar(255) UNIQUE NOT NULL,
-//  [token_type] varchar(50) NOT NULL,
-//  [expiration_date] DATETIME,
-//        [revoked] BIT NOT NULL,
-//        [expired] BIT NOT NULL,
-//        [user_id] BIGINT
-//)
-//GO

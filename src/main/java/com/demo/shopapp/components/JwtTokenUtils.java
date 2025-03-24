@@ -1,5 +1,6 @@
 package com.demo.shopapp.components;
 
+import com.demo.shopapp.entities.Token;
 import com.demo.shopapp.entities.User;
 import com.demo.shopapp.repositorys.TokenRepository;
 import io.jsonwebtoken.Claims;
@@ -16,10 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.InvalidParameterException;
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Component
@@ -94,14 +92,22 @@ public class JwtTokenUtils {
         return expirationDate.before(new Date());
     }
 
+    // check thu hồi
+    public boolean isTokenRevoke(String token){
+        Optional<Token> tokenEntity = tokenRepository.findByToken(token);
+        return tokenEntity.isPresent() && tokenEntity.get().getRevoked();
+    }
+
+
     public boolean validateToken(String token, UserDetails userDetails){
        if (!validateTokenFormat(token)){
            return false;
        }
         //  UserDetails trong Spring Security thường được lưu trong Security Context Holder sau khi người dùng đăng nhập thành công.
         String phoneNumber = extractPhoneNumber(token);
-        // check token = giống trong context holder và chưa hết hạn
-        return phoneNumber.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        // check token = giống trong context holder và chưa hết hạn Và chưa revoke
+        return phoneNumber.equals(userDetails.getUsername())
+                && !isTokenExpired(token)  && !isTokenRevoke(token);
     }
 
     public boolean validateTokenFormat(String token) {

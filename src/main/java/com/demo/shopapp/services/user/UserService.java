@@ -6,19 +6,23 @@ import com.demo.shopapp.dtos.request.UserDTO;
 import com.demo.shopapp.dtos.request.UserLoginDTO;
 import com.demo.shopapp.dtos.request.AdminUserUpdateRequest;
 import com.demo.shopapp.entities.Role;
+import com.demo.shopapp.entities.Token;
 import com.demo.shopapp.entities.User;
 import com.demo.shopapp.exceptions.DataNotFoundException;
 import com.demo.shopapp.exceptions.InvalidParamException;
 import com.demo.shopapp.exceptions.PermissionDeniedException;
 import com.demo.shopapp.repositorys.RoleRepository;
 import com.demo.shopapp.repositorys.UserRepository;
+import com.demo.shopapp.services.TokenService;
 import com.demo.shopapp.utils.MessageKeys;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +42,7 @@ public class UserService implements IUserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtils;
+    private final TokenService tokenService;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final LocalizationUtils localizationUtils;
 
@@ -105,8 +110,11 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(UserLoginDTO userLoginDTO) throws Exception {
+    public Token login(UserLoginDTO userLoginDTO, HttpServletRequest request) throws Exception {
 
+        // ưu tiên xóa token của các thiet bi khong phai cua mobile
+        String userAgent = request.getHeader("User-Agent");
+        System.out.println(userAgent);
         Optional<User> existingUser = this.userRepository
                 .findUsersByPhoneNumber(userLoginDTO.getPhoneNumber());
 
@@ -114,6 +122,7 @@ public class UserService implements IUserService {
             throw new DataNotFoundException("Incorrect phone number or password");
         }
 
+        // tài khoản bị khóa
         if(!existingUser.get().getIsActive()){
             throw new AccessDeniedException(localizationUtils.getLocalizationMessage(MessageKeys.USER_IS_LOCKED));
         }
@@ -121,9 +130,13 @@ public class UserService implements IUserService {
         // nếu không đăng bằng bằng google or facebook
         if(passwordEncoder.matches(userLoginDTO.getPassword().trim(), existingUser.get().getPassword()) ||
             !userLoginDTO.isPasswordBlank() || userLoginDTO.isFacebookAccountIdValid() || userLoginDTO.isGoogleAccountIdValid()){
-            // trả về JWT token
+
+
             String token = jwtTokenUtils.generateToken(existingUser.get());
-            return token;
+            // lưu token
+            Token tokenEntity  =  this.tokenService.saveToken(existingUser.get(), token, userAgent);
+            // trả về JWT token
+            return tokenEntity;
         }
         return null;
     }

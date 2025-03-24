@@ -148,23 +148,31 @@ public class ProductController {
         }
     }
 
-    private String storeFile(MultipartFile file) throws IOException {
-        if(!isImageFile(file) || file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
-            throw new IOException("invalid image file");
+    private String storeFile(MultipartFile file, String folder) throws IOException {
+        // Kiểm tra file có hợp lệ không
+        if (!isImageFile(file) || file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
+            throw new IOException("Invalid image file");
         }
 
-        String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
-        // đường dẫn tới thư mục mà bạn lưu file
-        Path uploadDir = Paths.get("uploads");
-        // kiểm tra và tạo thư mục nếu nó không tồn tại
-        if(!Files.exists(uploadDir)){
-            Files.createDirectory(uploadDir);
-        }
-        // tạo ra 1 đường dẫn tới thư mục upload
-        Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
-        // sao chép file vào đường dẫn  /uploads
+        // Normalize tên file để tránh ký tự nguy hiểm
+        String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        String fileExtension = originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
+
+        // Tạo tên file duy nhất
+        String uniqueFilename = UUID.randomUUID().toString() + fileExtension;
+
+        // Định nghĩa đường dẫn thư mục lưu file
+        Path folderPath = Paths.get(UPLOAD_DIR, folder).normalize();
+
+        // Tạo thư mục nếu chưa tồn tại
+        Files.createDirectories(folderPath);
+
+        // Tạo đường dẫn file đích
+        Path destination = folderPath.resolve(uniqueFilename).normalize();
+
+        // Sao chép file vào thư mục
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+
         return uniqueFilename;
     }
 
@@ -173,7 +181,7 @@ public class ProductController {
         return contentType != null && (contentType.startsWith("image/"));
     }
 
-    @PostMapping(value = "/uploads/{id}",
+    @PostMapping(value = "/uploads/products/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImgs(
             @PathVariable Long id,
@@ -202,7 +210,7 @@ public class ProductController {
                                 "file must be an image");
                     }
                     // lưu file
-                    String fileName = storeFile(file);
+                    String fileName = storeFile(file, "products");
 //                    fileNames.add(fileName);
 
                     Product existingProduct = this.productService.getProductById(id);
