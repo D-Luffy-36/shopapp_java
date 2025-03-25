@@ -6,6 +6,7 @@ import com.demo.shopapp.exceptions.DataNotFoundException;
 import com.demo.shopapp.exceptions.ExpiredTokenException;
 import com.demo.shopapp.repositorys.TokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -31,58 +32,65 @@ public class TokenService {
     private int expirationRefreshToken;
 
 
-    public boolean isMobileDevice(String userAgent) {
+    public boolean isMobileDevice(@NotNull String userAgent) {
         String device = userAgent.toLowerCase();
-        return device != null && (device.contains("android") || device.contains("iphone") || device.contains("mobile"));
+        return  device.contains("android") || device.contains("iphone") || device.contains("mobile");
     }
 
     public Token saveToken(User user, String newToken, String userAgent) {
+        try{
+            // Kiểm tra token moi nếu là mobile hay không
+            boolean isMobile = isMobileDevice(userAgent);
 
-        // Kiểm tra token moi nếu là mobile hay không
-        boolean isMobile = isMobileDevice(userAgent);
+            // tạo token mới
+            Token tokenEntity = Token.builder()
+                    .user(user)
+                    .token(newToken)
+                    .tokenType("Bearer")
+                    .expirationDate(LocalDateTime.now().plusDays(7)) // Token sống 7 ngày
+                    .revoked(false)
+                    .expired(false)
+                    .isMobile(isMobile)
+                    .build();
 
-        // tạo token mới
-        Token tokenEntity = Token.builder()
-                .user(user)
-                .token(newToken)
-                .tokenType("Bearer")
-                .expirationDate(LocalDateTime.now().plusDays(7)) // Token sống 7 ngày
-                .revoked(false)
-                .expired(false)
-                .isMobile(isMobile)
-                .build();
+            List<Token> tokens = this.tokenRepository.findByUserIdAndExpiredFalseAndRevokedFalse(user.getId());
 
-        List<Token> tokens = this.tokenRepository.findByUserIdAndExpiredFalseAndRevokedFalse(user.getId());
+            if ( tokens != null && tokens.size() >= MAX_TOKENS ) {
+                boolean flag = false;
+                for (Token token : tokens) {
+                    // Nếu token không phải của mobile, đánh dấu revoked
+                    if (!isMobile) {
+                        token.setRevoked(true);
+                        tokenRepository.save(token);
+                        flag = true;
+                        break;
+                    }
+                }
+                // neu tat ca la mobile
+                if(!flag){
+                    if(!tokens.isEmpty()){
+                        Token oldestToken = tokens.get(0);  // token cũ nhất là phần tử đầu tiên
+                        oldestToken.setRevoked(true);  // Đánh dấu revoked cho token cũ nhất
+                        tokenRepository.save(oldestToken);  // Lưu lại sự thay đổi của token cũ
+                    }
 
-        if (tokens.size() >= MAX_TOKENS) {
-            boolean flag = false;
-            for (Token token : tokens) {
-                // Nếu token không phải của mobile, đánh dấu revoked
-                if (!isMobile) {
-                    token.setRevoked(true);
-                    tokenRepository.save(token);
-                    flag = true;
-                    break;
                 }
             }
-            // neu tat ca la mobile
-            if(!flag){
-                Token oldestToken = tokens.get(0);  // token cũ nhất là phần tử đầu tiên
-                oldestToken.setRevoked(true);  // Đánh dấu revoked cho token cũ nhất
-                tokenRepository.save(oldestToken);  // Lưu lại sự thay đổi của token cũ
-            }
+            // Gia hạn thời gian expiration
+            long expirationInSeconds = expiration;
+            // thời gian hiện tại + khoảng thời gian
+            LocalDateTime expirationDateTime = LocalDateTime.now().plusSeconds(expirationInSeconds);
+
+            tokenEntity.setRefreshToken(UUID.randomUUID().toString());
+            tokenEntity.setRefreshExpirationDate(LocalDateTime.now().plusSeconds(expirationRefreshToken));
+
+            // Lưu token mới vào cơ sở dữ liệu
+            return tokenRepository.save(tokenEntity);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
-        // Gia hạn thời gian expiration
-        long expirationInSeconds = expiration;
-        // thời gian hiện tại + khoảng thời gian
-        LocalDateTime expirationDateTime = LocalDateTime.now().plusSeconds(expirationInSeconds);
-
-        tokenEntity.setRefreshToken(UUID.randomUUID().toString());
-        tokenEntity.setRefreshExpirationDate(LocalDateTime.now().plusSeconds(expirationRefreshToken));
-
-        // Lưu token mới vào cơ sở dữ liệu
-        return tokenRepository.save(tokenEntity);
     }
 
     public Token refreshToken(String refreshToken, User user) throws Exception {

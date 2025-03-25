@@ -45,13 +45,13 @@ public class UserDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày theo "yyyy-MM-dd"
     private LocalDate dateOfBirth;
 
-    @JsonProperty("facebook_account_id")
-    @Column(unique = true)
-    private String facebookAccountId;
-
-    @JsonProperty("google_account_id")
-    @Column(unique = true)
-    private String googleAccountId;
+//    @JsonProperty("facebook_account_id")
+//    @Column(unique = true)
+//    private String facebookAccountId;
+//
+//    @JsonProperty("google_account_id")
+//    @Column(unique = true)
+//    private String googleAccountId;
 
 
     @JsonProperty("roles")
@@ -86,13 +86,7 @@ public class UserDTO {
         return dateOfBirth;
     }
 
-    public String getFacebookAccountId() {
-        return facebookAccountId;
-    }
 
-    public String getGoogleAccountId() {
-        return googleAccountId;
-    }
 
     public String getEmail() {
         return email;

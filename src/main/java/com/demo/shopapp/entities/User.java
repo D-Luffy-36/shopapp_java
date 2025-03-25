@@ -2,6 +2,7 @@ package com.demo.shopapp.entities;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -41,12 +42,6 @@ public class User extends BaseEntity implements UserDetails {
     @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày theo "yyyy-MM-dd"
     private LocalDate dateOfBirth;
 
-    @Column(name = "facebook_account_id", unique = true)
-    private String faceBookAccountId;
-
-    @Column(name = "google_account_id", unique = true)
-    private String googleAccountId;
-
     @Column(name = "is_active")
     private Boolean isActive;
 
@@ -57,11 +52,15 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "avatar_url", length = 255)
     private String avatarUrl;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SocialAccount> socialAccounts = new ArrayList<>();
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
     @JoinTable(
             name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            joinColumns = @JoinColumn(name = "user_id"),  // Cột khóa ngoại trỏ đến User
+            inverseJoinColumns = @JoinColumn(name = "role_id") // // Cột khóa ngoại trỏ đến Role
     )
     private Set<Role> roles = new HashSet<>();
 

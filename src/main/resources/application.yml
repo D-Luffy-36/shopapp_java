@@ -7,6 +7,7 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+
 # Cấu hình kết nối cơ sở dữ liệu
 spring:
   datasource:
@@ -23,7 +24,6 @@ spring:
   web:
     resources:
       static-locations: file:/uploads/
-
 
   mvc:
     charset: UTF-8
@@ -42,11 +42,26 @@ spring:
 
 # Cấu hình bảo mật
   security:
-    enable: false
+    oauth2:
+      client:
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+        registration:
+          google: # Đăng ký Google OAuth2 client
+            client-id: 648757440833-sfda15k5qpfobvgrp33t5866b6gv1ji6.apps.googleusercontent.com   # ID của ứng dụng từ Google Cloud Console
+            client-secret: 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  # Secret key từ Google Cloud Console
+            redirect-uri: "${GOOGLE_REDIRECT_URI:http://localhost:8080/api/v1/users/login/social/callback}"  # Đường dẫn callback sau khi đăng nhập thành công
+            scope: # Các quyền (scopes) yêu cầu từ người dùng
+              - email  # Truy cập email của người dùng
+              - profile  # Truy cập thông tin hồ sơ (tên, ảnh đại diện,...)
+
     user:
       name: admin
       password: password
-      
+
   servlet:
     multipart:
       enabled: true
@@ -64,7 +79,6 @@ spring:
           auth: true
           starttls:
             enable: true
-
 
 api:
   prefix: /api/v1

@@ -11,8 +11,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByPhoneNumber(String phoneNumber);
-    boolean existsByGoogleAccountId(String googleId);
-    boolean existsByFaceBookAccountId(String facebookId);
 
     boolean existsByEmail(String email);
 

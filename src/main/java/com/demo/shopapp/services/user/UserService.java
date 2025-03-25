@@ -83,9 +83,6 @@ public class UserService implements IUserService {
         }
 
 
-
-
-        // tao đăng nhập mạng xã hội
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
                 .email(userDTO.getEmail())
@@ -96,9 +93,6 @@ public class UserService implements IUserService {
                 .roles(roles)
                 .build();
 
-        // Nếu không có Facebook hoặc Google account (tức là cả hai là chuỗi rỗng), thì yêu cầu nhập mật khẩu
-        if ((userDTO.getFacebookAccountId() == null || userDTO.getFacebookAccountId().isEmpty()) &&
-                (userDTO.getGoogleAccountId() == null || userDTO.getGoogleAccountId().isEmpty())) {
 
             // Kiểm tra nếu password không null và không rỗng
             if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
@@ -112,10 +106,7 @@ public class UserService implements IUserService {
                 if (encodedPassword == null || encodedPassword.isEmpty()) {
                     throw new RuntimeException("Encoded password is null or empty");
                 }
-            } else {
-               newUser.setGoogleAccountId(userDTO.getGoogleAccountId());
-               newUser.setFaceBookAccountId(userDTO.getFacebookAccountId());
-            }
+
         }
         return this.userRepository.save(newUser);
     }

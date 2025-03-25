@@ -62,8 +62,6 @@ public class UserResponse extends BaseResponse {
 //                .profileImage(user.getProfileImage())
                 .active(user.getIsActive())
                 .dateOfBirth(LocalDate.from(user.getDateOfBirth()))
-                .facebookAccountId(user.getFaceBookAccountId())
-                .googleAccountId(user.getGoogleAccountId())
                 .roles(
                         user.getRoles().stream()
                                 .map(Role::getName)

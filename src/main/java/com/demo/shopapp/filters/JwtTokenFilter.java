@@ -1,13 +1,12 @@
 package com.demo.shopapp.filters;
 
-
 import com.demo.shopapp.components.JwtTokenUtils;
 import com.demo.shopapp.entities.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
+
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,9 +77,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-            filterChain.doFilter(request, response); //enable bypass
-
-        // lỗi Sql có thể ở đây
+            filterChain.doFilter(request, response); //enable bypas
+        // lỗi Sql có thể ở đây, căt bearer nhưng token bị null
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Đặt mã trạng thái 401
             response.getWriter().write("Unauthorized: " + e.getMessage()); // Gửi thông báo lỗi chi tiết
@@ -99,22 +97,27 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(apiPrefix + "/roles", "GET"),
                 Pair.of(apiPrefix + "/images/", "GET"),
                 Pair.of(apiPrefix + "/users/login", "POST"),
-                Pair.of(apiPrefix + "/users/register", "POST")
+                Pair.of(apiPrefix + "/users/register", "POST"),
+                Pair.of(apiPrefix + "/users/login/social-login", "GET"),
+                Pair.of(apiPrefix + "/users/login/social/callback", "GET")
         );
-
 
         for (Pair<String, String> byPassToken : byPassTokens) {
             if (requestURI.equals(byPassToken.getKey()) && method.equalsIgnoreCase(byPassToken.getValue())) {
+                System.out.println("Bypassing token for: " + requestURI);
                 return true;
             }
 
-            // Nếu request bắt đầu bằng "/images/", cho phép truy cập công khai
             if (requestURI.startsWith(byPassToken.getKey()) && method.equalsIgnoreCase(byPassToken.getValue())) {
+                System.out.println("Bypassing token for prefix: " + requestURI);
                 return true;
             }
         }
+
+        System.out.println("JWT Required for: " + requestURI);
         return false;
     }
+
 
     // function này có lỗi ngu
 //    private boolean isByPassToken(@NonNull HttpServletRequest request) {

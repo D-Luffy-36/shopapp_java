@@ -42,6 +42,10 @@ public class WebSercurityConfig implements WebMvcConfigurer {
                             requests
                                     .requestMatchers("**")
                                     .permitAll()
+
+                                    .requestMatchers(HttpMethod.GET, String.format("%s/users/login/**", apiPrefix))
+                                    .permitAll() //
+
                                     .requestMatchers(HttpMethod.POST,
                                             String.format("%s/orders/**", apiPrefix))
                                     .hasRole(Role.ADMIN)
@@ -94,9 +98,15 @@ public class WebSercurityConfig implements WebMvcConfigurer {
                                             String.format("%s/images/**", apiPrefix))
                                     .permitAll()
 
+                                    .requestMatchers(HttpMethod.POST,
+                                            apiPrefix + "/users/login",
+                                            apiPrefix + "/users/register",
+                                            apiPrefix + "/users/login/social/callback")
+                                    .permitAll()
+
                                     .anyRequest().authenticated()
 
-                    );
+                    ).oauth2Login(Customizer.withDefaults());
 
             http.csrf(AbstractHttpConfigurer::disable);
             http.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {

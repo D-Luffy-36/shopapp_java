@@ -23,11 +23,10 @@ public class SocialAccount {
     @Column(name = "provider_id",length = 50)
     private String providerId;
 
-
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
