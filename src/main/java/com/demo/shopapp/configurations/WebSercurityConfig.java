@@ -17,7 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import com.demo.shopapp.filters.JwtTokenFilter;
+import com.demo.shopapp.shared.filters.JwtTokenFilter;
 import java.util.List;
 
 @Configuration

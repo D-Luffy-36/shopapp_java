@@ -1,5 +1,6 @@
 package com.demo.shopapp.entities;
 
+import com.demo.shopapp.domain.product.entity.Product;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;

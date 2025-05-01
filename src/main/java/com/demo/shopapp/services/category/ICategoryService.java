@@ -1,7 +1,7 @@
 package com.demo.shopapp.services.category;
 
-import com.demo.shopapp.dtos.request.CategoryDTO;
-import com.demo.shopapp.entities.Category;
+import com.demo.shopapp.domain.product.dto.CategoryDTO;
+import com.demo.shopapp.domain.product.entity.Category;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.demo.shopapp.repositorys;
 
 
-import com.demo.shopapp.entities.Category;
+import com.demo.shopapp.domain.product.entity.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

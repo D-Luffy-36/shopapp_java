@@ -1,15 +1,15 @@
-package com.demo.shopapp.services.product;
+package com.demo.shopapp.domain.product.service;
 
-import com.demo.shopapp.dtos.request.ProductDTO;
-import com.demo.shopapp.dtos.request.ProductImageDTO;
-import com.demo.shopapp.entities.Category;
-import com.demo.shopapp.entities.Product;
+import com.demo.shopapp.domain.product.dto.ProductDTO;
+import com.demo.shopapp.domain.product.dto.ProductImageDTO;
+import com.demo.shopapp.domain.product.entity.Category;
+import com.demo.shopapp.domain.product.entity.Product;
 import com.demo.shopapp.entities.ProductImage;
-import com.demo.shopapp.exceptions.DataNotFoundException;
-import com.demo.shopapp.exceptions.InvalidParamException;
+import com.demo.shopapp.shared.exceptions.DataNotFoundException;
+import com.demo.shopapp.shared.exceptions.InvalidParamException;
 import com.demo.shopapp.repositorys.CategoryRepository;
 import com.demo.shopapp.repositorys.ProductImageRepository;
-import com.demo.shopapp.repositorys.ProductRepository;
+import com.demo.shopapp.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 

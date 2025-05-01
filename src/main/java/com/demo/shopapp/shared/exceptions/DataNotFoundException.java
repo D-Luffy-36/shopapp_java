@@ -1,4 +1,4 @@
-package com.demo.shopapp.exceptions;
+package com.demo.shopapp.shared.exceptions;
 
 public class DataNotFoundException extends RuntimeException {
     public DataNotFoundException(String message) {

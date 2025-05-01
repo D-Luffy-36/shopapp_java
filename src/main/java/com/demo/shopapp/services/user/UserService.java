@@ -1,16 +1,14 @@
 package com.demo.shopapp.services.user;
-
-import com.demo.shopapp.components.JwtTokenUtils;
-import com.demo.shopapp.components.LocalizationUtils;
+import com.demo.shopapp.shared.components.JwtTokenUtils;
 import com.demo.shopapp.dtos.request.UserDTO;
 import com.demo.shopapp.dtos.request.UserLoginDTO;
 import com.demo.shopapp.dtos.request.AdminUserUpdateRequest;
 import com.demo.shopapp.entities.Role;
 import com.demo.shopapp.entities.Token;
 import com.demo.shopapp.entities.User;
-import com.demo.shopapp.exceptions.DataNotFoundException;
-import com.demo.shopapp.exceptions.InvalidParamException;
-import com.demo.shopapp.exceptions.PermissionDeniedException;
+import com.demo.shopapp.shared.exceptions.DataNotFoundException;
+import com.demo.shopapp.shared.exceptions.InvalidParamException;
+import com.demo.shopapp.shared.exceptions.PermissionDeniedException;
 import com.demo.shopapp.repositorys.RoleRepository;
 import com.demo.shopapp.repositorys.UserRepository;
 import com.demo.shopapp.services.TokenService;
@@ -24,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
@@ -39,17 +38,55 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenUtils jwtTokenUtils;
     private final TokenService tokenService;
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-    private final LocalizationUtils localizationUtils;
+
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("^(\\+84|0)[3|5|7|8|9][0-9]{8}$"); // Số VN
+
+
+    /**
+     * Locates the user based on the username. In the actual implementation, the search
+     * may possibly be case sensitive, or case insensitive depending on how the
+     * implementation instance is configured. In this case, the <code>UserDetails</code>
+     * object that comes back may have a username that is of a different case than what
+     * was actually requested..
+     *
+     * @param identifier the username identifying the user whose data is required.
+     * @return a fully populated user record (never <code>null</code>)
+     * @throws UsernameNotFoundException if the user could not be found or the user has no
+     *                                   GrantedAuthority
+     */
+    @Override
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        Optional<User> user = Optional.empty();
+
+        // Kiểm tra nếu identifier là email
+        if (identifier.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            // Tìm người dùng qua email
+            user = userRepository.findByEmail(identifier);
+
+        }
+        // Kiểm tra nếu identifier là số điện thoại
+        else if (identifier.matches("^[0-9]+$")) {
+            // Tìm người dùng qua số điện thoại
+            user = userRepository.findUsersByPhoneNumber(identifier);
+        }
+
+        if (user.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with identifier: " + identifier);
+        }
+
+        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(), user.get().getAuthorities());
+    }
+
 
     @Transactional
     @Override
@@ -127,18 +164,18 @@ public class UserService implements IUserService {
         String email = userLoginDTO.getEmail();
         String phone = userLoginDTO.getPhoneNumber();
 
-        if (EMAIL_PATTERN.matcher(email).matches()) {
+        if (email != null && EMAIL_PATTERN.matcher(email).matches()) {
             existingUser = this.userRepository.findByEmail(email);
-        }else{
+        } else if (phone != null && PHONE_PATTERN.matcher(phone).matches()) {
             existingUser = this.userRepository.findUsersByPhoneNumber(phone);
+        } else {
+            throw new IllegalArgumentException("Email and phone cannot both be null");
         }
-        if(existingUser.isEmpty()){
-            throw new DataNotFoundException("user not found");
-        }
+
 
         // tài khoản bị khóa
         if(!existingUser.get().getIsActive()){
-            throw new AccessDeniedException(localizationUtils.getLocalizationMessage(MessageKeys.USER_IS_LOCKED));
+            throw new AccessDeniedException(MessageKeys.USER_IS_LOCKED);
         }
 
         // nếu không đăng bằng bằng google or facebook
@@ -178,7 +215,7 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new DataNotFoundException("User not found"));
 
         if(!user.getIsActive()){
-            throw new AccessDeniedException(localizationUtils.getLocalizationMessage(MessageKeys.USER_IS_LOCKED));
+            throw new AccessDeniedException(MessageKeys.USER_IS_LOCKED);
         }
         return user;
     }

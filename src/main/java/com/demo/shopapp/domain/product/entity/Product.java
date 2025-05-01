@@ -1,6 +1,7 @@
-package com.demo.shopapp.entities;
+package com.demo.shopapp.domain.product.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.demo.shopapp.entities.BaseEntity;
+import com.demo.shopapp.entities.ProductImage;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

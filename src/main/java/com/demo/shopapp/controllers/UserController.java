@@ -11,7 +11,7 @@ import com.demo.shopapp.dtos.responses.user.ListUserResponse;
 import com.demo.shopapp.dtos.responses.user.LoginResponse;
 import com.demo.shopapp.dtos.responses.user.UserResponse;
 import com.demo.shopapp.services.user.UserService;
-import com.demo.shopapp.components.LocalizationUtils;
+import com.demo.shopapp.shared.components.LocalizationUtils;
 
 import com.demo.shopapp.utils.MessageKeys;
 import jakarta.servlet.http.HttpServletRequest;

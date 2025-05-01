@@ -1,6 +1,6 @@
 package com.demo.shopapp.dtos.responses.product;
 
-import com.demo.shopapp.entities.Product;
+import com.demo.shopapp.domain.product.entity.Product;
 import com.demo.shopapp.entities.ProductImage;
 import com.demo.shopapp.dtos.responses.BaseResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;

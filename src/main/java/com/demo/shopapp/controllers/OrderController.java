@@ -3,8 +3,8 @@ package com.demo.shopapp.controllers;
 import com.demo.shopapp.dtos.request.OrderDTO;
 import com.demo.shopapp.entities.Order;
 
-import com.demo.shopapp.mappers.OrderDetailMapper;
-import com.demo.shopapp.mappers.OrderMapper;
+import com.demo.shopapp.shared.mappers.OrderDetailMapper;
+import com.demo.shopapp.shared.mappers.OrderMapper;
 import com.demo.shopapp.dtos.responses.ResponseObject;
 import com.demo.shopapp.dtos.responses.order.ListOrderResponse;
 import com.demo.shopapp.dtos.responses.order.OrderResponse;

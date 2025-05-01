@@ -1,5 +1,6 @@
 package com.demo.shopapp.entities;
 
+import com.demo.shopapp.domain.product.entity.Product;
 import jakarta.persistence.*;
 
 public class Review extends BaseEntity{

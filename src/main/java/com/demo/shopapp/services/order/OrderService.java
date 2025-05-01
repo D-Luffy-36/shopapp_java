@@ -1,12 +1,13 @@
 package com.demo.shopapp.services.order;
 
+import com.demo.shopapp.domain.product.entity.Product;
 import com.demo.shopapp.dtos.request.OrderDTO;
 import com.demo.shopapp.entities.*;
-import com.demo.shopapp.exceptions.DataNotFoundException;
-import com.demo.shopapp.mappers.OrderMapper;
+import com.demo.shopapp.shared.exceptions.DataNotFoundException;
+import com.demo.shopapp.shared.mappers.OrderMapper;
 import com.demo.shopapp.repositorys.OrderDetailRepository;
 import com.demo.shopapp.repositorys.OrderRepository;
-import com.demo.shopapp.repositorys.ProductRepository;
+import com.demo.shopapp.domain.product.repository.ProductRepository;
 import com.demo.shopapp.repositorys.UserRepository;
 
 

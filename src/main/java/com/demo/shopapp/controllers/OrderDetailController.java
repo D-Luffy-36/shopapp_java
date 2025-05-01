@@ -2,7 +2,7 @@ package com.demo.shopapp.controllers;
 
 import com.demo.shopapp.dtos.request.OrderDetailDTO;
 import com.demo.shopapp.entities.OrderDetail;
-import com.demo.shopapp.mappers.OrderDetailMapper;
+import com.demo.shopapp.shared.mappers.OrderDetailMapper;
 import com.demo.shopapp.dtos.responses.ResponseObject;
 import com.demo.shopapp.dtos.responses.orderDetail.OrderDetailResponse;
 import com.demo.shopapp.services.order.OrderService;

@@ -1,4 +1,4 @@
-package com.demo.shopapp.components;
+package com.demo.shopapp.shared.components;
 
 import com.demo.shopapp.utils.WebUtils;
 import jakarta.servlet.http.HttpServletRequest;

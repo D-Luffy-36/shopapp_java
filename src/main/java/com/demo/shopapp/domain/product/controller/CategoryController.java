@@ -1,7 +1,7 @@
-package com.demo.shopapp.controllers;
+package com.demo.shopapp.domain.product.controller;
 
-import com.demo.shopapp.dtos.request.CategoryDTO;
-import com.demo.shopapp.entities.Category;
+import com.demo.shopapp.domain.product.dto.CategoryDTO;
+import com.demo.shopapp.domain.product.entity.Category;
 import com.demo.shopapp.dtos.responses.ResponseObject;
 import com.demo.shopapp.services.category.CategorySevice;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +32,8 @@ public class CategoryController {
 
     @PostMapping()
     public ResponseEntity<?> create(
-            @Valid @RequestBody CategoryDTO categoryDTO, BindingResult result) {
+            @Valid @RequestBody CategoryDTO categoryDTO,
+            BindingResult result) {
         if(result.hasErrors()) {
             List<String> errorMessages = result.getFieldErrors().stream()
                     .map(FieldError -> FieldError.getDefaultMessage())

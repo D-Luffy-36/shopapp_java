@@ -1,4 +1,4 @@
-package com.demo.shopapp.mappers;
+package com.demo.shopapp.shared.mappers;
 
 
 import com.demo.shopapp.dtos.request.OrderDTO;

@@ -1,7 +1,7 @@
 package com.demo.shopapp.entities;
 
+import com.demo.shopapp.domain.product.entity.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;

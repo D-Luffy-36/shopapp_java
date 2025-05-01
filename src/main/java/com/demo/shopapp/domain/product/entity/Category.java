@@ -1,4 +1,4 @@
-package com.demo.shopapp.entities;
+package com.demo.shopapp.domain.product.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

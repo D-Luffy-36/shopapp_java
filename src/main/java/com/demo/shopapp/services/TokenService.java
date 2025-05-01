@@ -1,9 +1,9 @@
 package com.demo.shopapp.services;
-import com.demo.shopapp.components.JwtTokenUtils;
+import com.demo.shopapp.shared.components.JwtTokenUtils;
 import com.demo.shopapp.entities.Token;
 import com.demo.shopapp.entities.User;
-import com.demo.shopapp.exceptions.DataNotFoundException;
-import com.demo.shopapp.exceptions.ExpiredTokenException;
+import com.demo.shopapp.shared.exceptions.DataNotFoundException;
+import com.demo.shopapp.shared.exceptions.ExpiredTokenException;
 import com.demo.shopapp.repositorys.TokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;

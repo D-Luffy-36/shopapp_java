@@ -2,14 +2,14 @@ package com.demo.shopapp.services.orderdetail;
 
 import com.demo.shopapp.dtos.request.OrderDetailDTO;
 import com.demo.shopapp.entities.Order;
-import com.demo.shopapp.entities.Product;
+import com.demo.shopapp.domain.product.entity.Product;
 import com.demo.shopapp.entities.OrderDetail;
-import com.demo.shopapp.exceptions.DataNotFoundException;
-import com.demo.shopapp.mappers.OrderDetailMapper;
-import com.demo.shopapp.mappers.OrderMapper;
+import com.demo.shopapp.shared.exceptions.DataNotFoundException;
+import com.demo.shopapp.shared.mappers.OrderDetailMapper;
+import com.demo.shopapp.shared.mappers.OrderMapper;
 import com.demo.shopapp.repositorys.OrderDetailRepository;
 import com.demo.shopapp.repositorys.OrderRepository;
-import com.demo.shopapp.repositorys.ProductRepository;
+import com.demo.shopapp.domain.product.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

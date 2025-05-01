@@ -1,8 +1,8 @@
 package com.demo.shopapp.services.category;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.demo.shopapp.dtos.request.CategoryDTO;
-import com.demo.shopapp.entities.Category;
+import com.demo.shopapp.domain.product.dto.CategoryDTO;
+import com.demo.shopapp.domain.product.entity.Category;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

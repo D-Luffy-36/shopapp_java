@@ -1,13 +1,13 @@
 package com.demo.shopapp.controllers;
-import com.demo.shopapp.components.JwtTokenUtils;
-import com.demo.shopapp.components.LocalizationUtils;
+import com.demo.shopapp.shared.components.JwtTokenUtils;
+import com.demo.shopapp.shared.components.LocalizationUtils;
 
 import com.demo.shopapp.dtos.responses.user.LoginResponse;
 import com.demo.shopapp.entities.Role;
 import com.demo.shopapp.entities.SocialAccount;
 import com.demo.shopapp.entities.Token;
 import com.demo.shopapp.entities.User;
-import com.demo.shopapp.exceptions.DataNotFoundException;
+import com.demo.shopapp.shared.exceptions.DataNotFoundException;
 
 import com.demo.shopapp.repositorys.RoleRepository;
 import com.demo.shopapp.repositorys.SocialAccountRepository;
