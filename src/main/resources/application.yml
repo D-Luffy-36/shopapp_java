@@ -40,7 +40,11 @@ spring:
       ddl-auto: update  # Tự động tạo bảng nếu chưa có
     show-sql: true  # Hiển thị câu lệnh SQL trong console
 
-# Cấu hình bảo mật
+  jackson:
+    mapper:
+      accept-case-insensitive-enums: true  # Chấp nhận enum không phân biệt chữ hoa chữ thường
+
+  # Cấu hình bảo mật
   security:
     oauth2:
       client:
@@ -88,4 +92,22 @@ jwt:
   expiration: 2592000
   expiration-refresh-token: 5184000 #60 days = 60 * 24 * 60 * 60
 
-#  spring.jpa.hibernate.ddl-auto=none
+# VNPay Sandbox Configuration
+vnpay:
+  vnp_TmnCode: "ATD2CAUF"
+  vnp_HashSecret: "0ERA7PHSYV3CRFJB1W4OI04PZZDYZA2W"
+  vnp_Url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  vnp_ReturnUrl: "http://localhost:8080/api/v1/payment/vnpay-return"
+
+
+# PayPal Sandbox Configuration
+paypal:
+  client:
+    id: "AVQPOG0KRfz22PxqO-PHW3Njc37_ilyUixlxSzuI_s2vQonptF76NS-sldORXjjDXlXgAezNtNywik0y"
+    secret: "EN15GcZTDDaBwi-2V3mRgUja08KSlUPWa-xhf71LQg_gbM2ciwVu7e9jSbIgbCcMRg_3ct91nIiPnJ6W"
+  mode: "sandbox"
+  return-url: "http://localhost:8080/api/v1/payment/paypal-return"
+  cancel-url: "http://localhost:8080/api/v1/payment/paypal-cancel"
+
+
+

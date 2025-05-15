@@ -1,8 +1,8 @@
 package com.demo.shopapp.shared.components;
 
-import com.demo.shopapp.entities.Token;
-import com.demo.shopapp.entities.User;
-import com.demo.shopapp.repositorys.TokenRepository;
+import com.demo.shopapp.domain.user.entity.Token;
+import com.demo.shopapp.domain.user.entity.User;
+import com.demo.shopapp.domain.user.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,6 +33,11 @@ public class JwtTokenUtils {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenUtils.class);
 
     public String generateToken(User user ) throws InvalidParameterException {
+        if (user.getPhoneNumber() == null && user.getEmail() == null) {
+            logger.error("Cannot generate token: Both phoneNumber and email are null for userId: {}", user.getId());
+            throw new InvalidParameterException("User must have either phone number or email");
+        }
+
         Map<String, Object> claims = new HashMap<>();
 //        this.generateSecretKey();
         claims.put("phoneNumber", user.getPhoneNumber());
@@ -46,15 +51,19 @@ public class JwtTokenUtils {
         claims.put("roles", roleNames);
 
         try {
+            String subject = user.getEmail() != null ? user.getEmail() : user.getPhoneNumber();
+
             String token = Jwts.builder()
                     .setClaims(claims)
                     .setSubject( user.getEmail() == null ? user.getPhoneNumber() : user.getEmail()) // ưu tiên email
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
+            logger.info("Generated token for userId: {} with subject: {}", user.getId(), subject);
             return token;
 
         }catch (Exception e) {
+            logger.error("Failed to generate token for userId: {} due to: {}", user.getId(), e.getMessage(), e);
             throw new InvalidParameterException("Cannot create jwt token, error: " + e.getMessage());
         }
     }
@@ -66,11 +75,16 @@ public class JwtTokenUtils {
 
     // có claim rồi sao extract ra ?
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSignInKey()) //giải mã token
-                .build()
-                .parseClaimsJws(token) //Parse chuỗi token để lấy ra tất cả các claims
-                .getBody(); //Lấy phần payload của token, nơi chứa các claims
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            logger.error("Failed to extract claims from token: {}", e.getMessage(), e);
+            throw new InvalidParameterException("Invalid token format: " + e.getMessage());
+        }
     }
 
     // functional interface
@@ -99,39 +113,51 @@ public class JwtTokenUtils {
 
     public String extractIdentifier(String token) {
         Claims claims = extractAllClaims(token);
+        String email = claims.get("email", String.class);
+        String phoneNumber = claims.get("phoneNumber", String.class);
 
-        // Ưu tiên lấy email, nếu không có thì lấy số điện thoại
-        return claims.get("email", String.class) != null
-                ? claims.get("email", String.class)
-                : claims.get("phoneNumber", String.class);
+        if (email != null) return email;
+        if (phoneNumber != null) return phoneNumber;
+        logger.error("No valid identifier (email or phone) found in token");
+        throw new InvalidParameterException("Token must contain either email or phone number");
     }
 
 
     // check thu hồi
-    public boolean isTokenRevoke(String token){
-        Optional<Token> tokenEntity = tokenRepository.findByToken(token);
-        return tokenEntity.isPresent() && tokenEntity.get().getRevoked();
+    public boolean isTokenRevoked(String token) {
+        return tokenRepository.findByToken(token)
+                .map(Token::getRevoked)
+                .orElse(true); // Nếu không tìm thấy token, coi như bị thu hồi
     }
 
 
-    public boolean validateToken(String token, UserDetails userDetails){
-       if (!validateTokenFormat(token)){
-           return false;
-       }
-        //  UserDetails trong Spring Security thường được lưu trong Security Context Holder sau khi người dùng đăng nhập thành công.
-        String phoneNumber = extractPhoneNumber(token);
-        // check token = giống trong context holder và chưa hết hạn Và chưa revoke
-        return phoneNumber.equals(userDetails.getUsername())
-                && !isTokenExpired(token)  && !isTokenRevoke(token);
+    public boolean validateToken(String token, UserDetails userDetails) {
+        if (!validateTokenFormat(token)) {
+            logger.warn("Invalid token format: {}", token);
+            return false;
+        }
+
+        String tokenIdentifier = extractIdentifier(token);
+        String userDetailsUsername = userDetails.getUsername();
+
+        if (tokenIdentifier == null || userDetailsUsername == null) {
+            logger.error("Token identifier or username is null");
+            return false;
+        }
+
+        boolean isValid = tokenIdentifier.equals(userDetailsUsername) &&
+                !isTokenExpired(token) &&
+                !isTokenRevoked(token);
+        if (!isValid) {
+            logger.warn("Token validation failed for token: {}, username: {}", token, userDetailsUsername);
+        } else {
+            logger.info("Token validated successfully for username: {}", userDetailsUsername);
+        }
+        return isValid;
     }
 
     public boolean validateTokenFormat(String token) {
-        if (token == null || token.isBlank()) {
-            return false;
-        }
-        return true;
+        return token != null && !token.isBlank();
     }
-
-
 
 }

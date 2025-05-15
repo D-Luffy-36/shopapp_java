@@ -4,7 +4,7 @@ import com.demo.shopapp.domain.product.dto.ProductDTO;
 import com.demo.shopapp.domain.product.dto.ProductImageDTO;
 
 import com.demo.shopapp.domain.product.entity.Product;
-import com.demo.shopapp.entities.ProductImage;
+import com.demo.shopapp.domain.product.entity.ProductImage;
 import com.demo.shopapp.shared.exceptions.InvalidParamException;
 import org.springframework.data.domain.Page;
 

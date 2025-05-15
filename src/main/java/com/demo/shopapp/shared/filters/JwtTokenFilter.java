@@ -1,13 +1,13 @@
 package com.demo.shopapp.shared.filters;
 
+import com.demo.shopapp.domain.user.service.user.UserService;
+
+
 import com.demo.shopapp.shared.components.JwtTokenUtils;
-import com.demo.shopapp.services.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.*;
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.IOException;
 
 import java.util.List;
@@ -31,7 +30,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final UserService userService;
     private final JwtTokenUtils jwtTokenUtils;
-
 
     /**
      * Same contract as for {@code doFilter}, but guaranteed to be
@@ -99,7 +97,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(apiPrefix + "/users/login", "POST"),
                 Pair.of(apiPrefix + "/users/register", "POST"),
                 Pair.of(apiPrefix + "/users/login/social-login", "GET"),
-                Pair.of(apiPrefix + "/users/login/social/callback", "GET")
+                Pair.of(apiPrefix + "/users/login/social/callback", "GET"),
+                Pair.of(apiPrefix + "/payment/paypal-return", "GET"),
+                Pair.of(apiPrefix + "/payment/paypal-cancel", "GET")
+
         );
 
         for (Pair<String, String> byPassToken : byPassTokens) {

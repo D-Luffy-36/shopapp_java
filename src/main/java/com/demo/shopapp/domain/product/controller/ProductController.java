@@ -3,10 +3,10 @@ package com.demo.shopapp.domain.product.controller;
 import com.demo.shopapp.domain.product.dto.ProductDTO;
 import com.demo.shopapp.domain.product.dto.ProductImageDTO;
 import com.demo.shopapp.domain.product.entity.Product;
-import com.demo.shopapp.entities.ProductImage;
+import com.demo.shopapp.domain.product.entity.ProductImage;
 import com.demo.shopapp.shared.exceptions.DataNotFoundException;
-import com.demo.shopapp.dtos.responses.product.ListProductResponse;
-import com.demo.shopapp.dtos.responses.product.ProductResponse;
+import com.demo.shopapp.domain.product.dto.ListProductResponse;
+import com.demo.shopapp.domain.product.dto.ProductResponse;
 import com.demo.shopapp.domain.product.service.ProductService;
 
 import com.github.javafaker.Faker;
@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -181,58 +182,6 @@ public class ProductController {
         return contentType != null && (contentType.startsWith("image/"));
     }
 
-    @PostMapping(value = "/uploads/products/{id}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadImgs(
-            @PathVariable Long id,
-            @RequestParam("files") List<MultipartFile> files) throws IOException, Exception {
-
-        files = files == null ? new ArrayList<>() : files;
-        if(files.size() > ProductImage.MAX_IMAGES){
-            return ResponseEntity.badRequest().body("max image just 5 files");
-        }
-        try{
-            List<ProductImage> images = new ArrayList<>();
-            // check size và format đã ổn chưa
-            for (MultipartFile file : files) {
-                // check file rỗng
-                if(file.getSize() == 0){
-                    continue;
-                }
-                if(file != null ) {
-                    // kích thước > 10 MB
-                    if(file.getSize() > 10 * 1024 * 1024) {
-                        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(
-                                "error = " + file.getSize() + " MB");
-                    }
-                    if(!isImageFile(file)) {
-                        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(
-                                "file must be an image");
-                    }
-                    // lưu file
-                    String fileName = storeFile(file, "products");
-//                    fileNames.add(fileName);
-
-                    Product existingProduct = this.productService.getProductById(id);
-                    if(existingProduct == null){
-                        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("cant not found product");
-                    }
-
-                    // lưu vào bảng product_images
-                    ProductImageDTO newProductImageDTO = ProductImageDTO.builder()
-                            .imageUrl(fileName)
-                            .productId(id)
-                            .build();
-                    ProductImage newProductImage = this.productService.createProductImage(id, newProductImageDTO);
-                    images.add(newProductImage);
-                }
-            }
-            return ResponseEntity.ok(images);
-        }catch (RuntimeException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-
-    }
 
 
 //    @PostMapping("/generateFakeProducts")
@@ -267,5 +216,93 @@ public class ProductController {
         }
 
     }
+
+    @PostMapping(value = "/uploads/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImgs(
+            @PathVariable Long id,
+            @RequestParam("files") List<MultipartFile> files) {
+
+        files = files == null ? new ArrayList<>() : files;
+        if (files.isEmpty()) {
+            return ResponseEntity.badRequest().body("No files provided.");
+        }
+
+        try {
+            Product existingProduct = productService.getProductById(id);
+            if (existingProduct == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Cannot find product with id: " + id);
+            }
+
+            List<ProductImage> existingImages = existingProduct.getImages();
+            int currentImageCount = existingImages.size();
+            int newImageCount = files.size();
+            int totalImageCount = currentImageCount + newImageCount;
+
+            // Xóa ảnh cũ nếu vượt quá MAX_IMAGES
+            if (totalImageCount > ProductImage.MAX_IMAGES) {
+                existingImages.sort(Comparator.comparingLong(ProductImage::getId));
+                int imagesToRemove = totalImageCount - ProductImage.MAX_IMAGES;
+
+                for (int i = 0; i < imagesToRemove; i++) {
+                    ProductImage oldestImage = existingImages.get(0);
+                    String filePath = UPLOAD_DIR;
+                    Path path = Paths.get(filePath);
+                    if (Files.exists(path)) {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            System.err.println("Failed to delete file: " + filePath);
+                            e.printStackTrace();
+                        }
+                    }
+
+                    // Xóa ảnh khỏi DB
+                    productService.deleteProductImageById(oldestImage.getId());
+
+                    // Xóa khỏi danh sách hiện tại
+                    existingImages.remove(0);
+                }
+            }
+
+            List<ProductImage> newImages = new ArrayList<>();
+            for (MultipartFile file : files) {
+                if (file.isEmpty()) continue;
+
+                if (file.getSize() > 10 * 1024 * 1024) {
+                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                            .body("File size too large: " + file.getSize() + " bytes");
+                }
+
+                if (!isImageFile(file)) {
+                    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                            .body("File must be an image");
+                }
+
+                String fileName = storeFile(file, "products");
+
+                ProductImageDTO newProductImageDTO = ProductImageDTO.builder()
+                        .imageUrl(fileName)
+                        .productId(id)
+                        .build();
+
+                ProductImage newProductImage = productService.createProductImage(id, newProductImageDTO);
+                newImages.add(newProductImage);
+            }
+
+            // Nếu chưa có thumbnail, gán thumbnail là ảnh đầu tiên
+            if (existingProduct.getThumbnail() == null || existingProduct.getThumbnail().isEmpty()) {
+                if (!existingProduct.getImages().isEmpty()) {
+                    existingProduct.setThumbnail(existingProduct.getImages().get(0).getImageUrl());
+                    productService.save(existingProduct);
+                }
+            }
+
+            return ResponseEntity.ok(newImages);
+        } catch (RuntimeException | IOException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
 }

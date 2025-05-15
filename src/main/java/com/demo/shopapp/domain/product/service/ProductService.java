@@ -4,11 +4,11 @@ import com.demo.shopapp.domain.product.dto.ProductDTO;
 import com.demo.shopapp.domain.product.dto.ProductImageDTO;
 import com.demo.shopapp.domain.product.entity.Category;
 import com.demo.shopapp.domain.product.entity.Product;
-import com.demo.shopapp.entities.ProductImage;
+import com.demo.shopapp.domain.product.entity.ProductImage;
 import com.demo.shopapp.shared.exceptions.DataNotFoundException;
 import com.demo.shopapp.shared.exceptions.InvalidParamException;
-import com.demo.shopapp.repositorys.CategoryRepository;
-import com.demo.shopapp.repositorys.ProductImageRepository;
+import com.demo.shopapp.domain.product.repository.CategoryRepository;
+import com.demo.shopapp.domain.product.repository.ProductImageRepository;
 import com.demo.shopapp.domain.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +26,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
     private final ProductRepository productRepository;
-    private final ProductImageRepository imageRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
+
+    // Đường dẫn thư mục lưu ảnh trên server (cần cấu hình trong properties hoặc environment)
+    private static final String UPLOAD_DIR = "uploads/products/";
 
     @Transactional
     @Override
@@ -50,7 +52,7 @@ public class ProductService implements IProductService {
 
 
     @Override
-    public Page<Product> getAllProducts(String keyWord, Long category_id ,int page, int limit) {
+    public Page<Product> getAllProducts(String keyWord, Long categoryId ,int page, int limit) {
         if (page <= 0) {
             page = 1; // Đặt giá trị mặc định
         }
@@ -58,7 +60,7 @@ public class ProductService implements IProductService {
         Pageable pageable = PageRequest.of(page - 1, limit,
 //                Sort.by("createdAt").descending()
                 Sort.by("id").ascending());
-        return this.productRepository.searchProducts(keyWord, category_id, pageable);
+        return this.productRepository.searchProducts(keyWord, categoryId, pageable);
 
     }
 
@@ -86,18 +88,24 @@ public class ProductService implements IProductService {
     @Transactional
     @Override
     public Product updateProduct(Long id, ProductDTO productDTO) {
+        // Tìm sản phẩm hiện tại
         Product currentProduct = this.productRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Product not found with id: " + id));
-        // copy các thuốc tính từ dto -> current product
-        // Model Mapper
 
-        Category category = this.categoryRepository.findCategoryById(productDTO.getCategoryId())
-                .orElseThrow(() -> new DataNotFoundException("Category not found with id: " + productDTO.getCategoryId()));
+        Category category = null;
+        // Tìm category
+        if(productDTO.getCategoryId() != null || productDTO.getCategoryId() != 0){
+            category = this.categoryRepository.findCategoryById(productDTO.getCategoryId())
+                    .orElseThrow(() -> new DataNotFoundException("Category not found with id: " + productDTO.getCategoryId()));
+            currentProduct.setCategory(category);
+        }
 
         currentProduct.setName(productDTO.getName());
         currentProduct.setPrice(Double.valueOf(productDTO.getPrice()));
         currentProduct.setDescription(productDTO.getDescription());
         currentProduct.setThumbnail(productDTO.getThumbnail());
-        currentProduct.setCategory(category);
+        if(category != null){
+            currentProduct.setCategory(category);
+        }
 
         return this.productRepository.save(currentProduct);
     }
@@ -132,6 +140,17 @@ public class ProductService implements IProductService {
 
     public boolean existingProductName(String name){
         return this.productRepository.existsByName(name);
+    }
+
+
+    @Transactional
+    public void deleteProductImageById(Long imageId) {
+        productImageRepository.deleteById(imageId);
+    }
+
+    @Transactional
+    public Product save(Product product) {
+        return productRepository.save(product);
     }
 
 //    boolean existingProduct(Long productId) {

@@ -1,6 +1,6 @@
 package com.demo.shopapp.configurations;
 
-import com.demo.shopapp.entities.Role;
+import com.demo.shopapp.domain.role.entity.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,6 +53,10 @@ public class WebSercurityConfig implements WebMvcConfigurer {
                                     .requestMatchers(HttpMethod.GET,
                                             String.format("%s/orders/**", apiPrefix))
                                     .permitAll()
+
+                                    .requestMatchers("/auth/**", "/payment/vnpay-return").permitAll() // Cho phép truy cập public
+
+                                    .requestMatchers("/payment/**").authenticated() // Bảo vệ các endpoint thanh toán
 
                                     .requestMatchers(HttpMethod.PUT,
                                             String.format("%s/orders/**", apiPrefix))

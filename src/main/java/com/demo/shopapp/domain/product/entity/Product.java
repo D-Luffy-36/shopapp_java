@@ -1,7 +1,6 @@
 package com.demo.shopapp.domain.product.entity;
 
-import com.demo.shopapp.entities.BaseEntity;
-import com.demo.shopapp.entities.ProductImage;
+import com.demo.shopapp.shared.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -36,7 +35,6 @@ public class Product extends BaseEntity {
     private Category category;
 
     @OneToMany(mappedBy = "product", orphanRemoval = true)
-
     private List<ProductImage> images;
 
 }

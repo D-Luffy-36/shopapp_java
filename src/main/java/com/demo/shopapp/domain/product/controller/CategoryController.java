@@ -2,8 +2,8 @@ package com.demo.shopapp.domain.product.controller;
 
 import com.demo.shopapp.domain.product.dto.CategoryDTO;
 import com.demo.shopapp.domain.product.entity.Category;
-import com.demo.shopapp.dtos.responses.ResponseObject;
-import com.demo.shopapp.services.category.CategorySevice;
+import com.demo.shopapp.shared.response.ResponseObject;
+import com.demo.shopapp.domain.product.service.CategorySevice;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
